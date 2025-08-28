@@ -2,14 +2,20 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <string>
+#include <vector>
+#include <random>
 
-#include "objects.cpp"
+#include "game.cpp"
 
 using namespace std;
 
 void display();
 void reshape(int, int);
 void animate(int);
+
+
+vector<Bomb> bombs;
+Player player = Player();
 
 
 int main(int argc, char** argv) {
@@ -23,7 +29,14 @@ int main(int argc, char** argv) {
     glutReshapeFunc(reshape);
     glutTimerFunc(1000, animate, 0);
 
-    glClearColor(0, 0, 0, 1);
+    glClearColor(1, 1, 1, 1);
+
+    for (int i = 0; i < 5; i++) {
+        vector<float> point = getRandomPoint();
+        Text newText("word", 0, 0);
+        Bomb newBomb(2, newText, point[0], point[1]);
+        bombs.push_back(newBomb);
+    }
 
     glutMainLoop();
 
@@ -31,22 +44,20 @@ int main(int argc, char** argv) {
 }
 
 
-Text text1("Hello World", 50, 90);
-Text text2("Hello", -50, 90);
-
-Text text("word", 0, 0);
-Bomb bomb1(3, text, -50, 80);
-
-
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
+    // drawCircle(7.0f, 0.0f, -80.0f, 0, 360, GL_POLYGON);
 
-    text1.draw();
-    text2.draw();
+    // text1.draw();
+    // text2.draw();
+    player.draw();
 
-    bomb1.draw();
+    // bomb1.draw();
+    for (int i = 0; i < bombs.size(); i++) {
+        bombs[i].draw();
+    }
 
 
     glutSwapBuffers();
@@ -61,7 +72,13 @@ void animate(int)
     // text1.animate();
     // text2.animate();
 
-    bomb1.animate();
+    for (int i = 0; i < bombs.size(); i++) {
+        bombs[i].animate();
+        if (bombs[i].isDone()) {
+            bombs.erase(bombs.begin() + i);
+            i--;
+        }
+    }
 }
 
 
@@ -73,10 +90,8 @@ void reshape(int w, int h) {
 
     float aspect = (float)w / (float)h;
     if (aspect >= 1.0f) {
-        // Wide window
         gluOrtho2D(-100.0f * aspect, 100.0f * aspect, -100.0f, 100.0f);
     } else {
-        // Tall window
         gluOrtho2D(-100.0f, 100.0f, -100.0f / aspect, 100.0f / aspect);
     }
 
