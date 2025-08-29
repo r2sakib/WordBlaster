@@ -14,8 +14,9 @@ void reshape(int, int);
 void animate(int);
 
 
-vector<Bomb> bombs;
 Player player = Player();
+vector<Bomb> bombs;
+Bullet bullet1;
 
 
 int main(int argc, char** argv) {
@@ -37,6 +38,7 @@ int main(int argc, char** argv) {
         Bomb newBomb(2, newText, point[0], point[1]);
         bombs.push_back(newBomb);
     }
+    bullet1 = Bullet(&bombs[0]);
 
     glutMainLoop();
 
@@ -44,17 +46,18 @@ int main(int argc, char** argv) {
 }
 
 
+// Text newText("word", 0, 0);
+// Bomb bomb(2, newText, -80, 80);
+// Bullet bullet1(&bombs[0]);
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
-    // drawCircle(7.0f, 0.0f, -80.0f, 0, 360, GL_POLYGON);
-
-    // text1.draw();
-    // text2.draw();
     player.draw();
+    // bomb.draw();
+    bullet1.draw();
 
-    // bomb1.draw();
     for (int i = 0; i < bombs.size(); i++) {
         bombs[i].draw();
     }
@@ -69,9 +72,6 @@ void animate(int)
     glutPostRedisplay();
     glutTimerFunc(1000/60, animate, 0);
 
-    // text1.animate();
-    // text2.animate();
-
     for (int i = 0; i < bombs.size(); i++) {
         bombs[i].animate();
         if (bombs[i].isDone()) {
@@ -79,6 +79,8 @@ void animate(int)
             i--;
         }
     }
+    // bomb.animate();
+    bullet1.animate();
 }
 
 

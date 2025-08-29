@@ -47,18 +47,21 @@ void drawCircle(float radius, float xc, float yc, float startAngle, float endAng
 }
 
 
-void drawElipse(float h, float k, float a, float b, int primative)
+void drawElipse(float h, float k, float a, float b, int primative, float y_min=-9999.0f)
 {
     glBegin(primative);
-    for(int i=0;i<200;i++)
+    for(int i = 0; i < 200;i++)
             {
-                float pi=3.1416;
+                float pi = 3.1416;
                 float A = (i*2*pi)/200;
                 float scale = sqrt(3.1f);
                 float x = h + a * scale * cos(A); 
                 float y = k + b * scale * sin(A);
-                glVertex2f(x, y);
+
+                if (y >= y_min)
+                    glVertex2f(x, y);
             }
+            
     glEnd();
 }
 
@@ -75,23 +78,58 @@ void drawPoints(const vector<vector<float>>& points, int primative)
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
+        // HEAD
+        glColor3f(0, 0, 0);  
+        // glLineWidth(1.5);
 
-    
-    glColor3ub(255, 0, 0);
-    glLineWidth(2);
-    drawCircle(7.0f, 0.0f, 0.0f, 0, 360, GL_LINE_LOOP);
+        // drawElipse(0.0f, 0.0f, 0.65f, 2.5f, GL_LINE_LOOP, 0.95f);
+        
+        // glColor3ub(163, 110, 91);
+        // glPushMatrix();
+        // glScalef(0.9f, 0.9f, 1.0f);
+        //     drawElipse(0.0f, 0.0f, 0.65f, 2.5f, GL_POLYGON, 0.95f);
+        // glPopMatrix();
 
-    glColor3ub(0, 0, 0);
-    glPushMatrix();
-    glScalef(0.8f, 0.8f, 0);
-        drawCircle(7.0f, 0.0f, 0.0f, 0, 360, GL_POLYGON);
-    glPopMatrix();
-    
-    vector<vector<float>> points = {
-        {-2.0, 1.0f}, {-1.0, 2.0}, {0.0, 2.5}, {1.0, 2.0}, {2.0, 1.0f}
-    };
+        // // UPERBODY
+        // glColor3f(0, 0, 0);  
+        // vector<vector<float>> UPPER_BODY_POINTS = {
+        //     {-1.11f,1.0f}, {-1.11f,-4.5f}, {-1.6f,-5.2f}, {1.6f,-5.2f}, {1.11f,-4.5f}, {1.11f,1.0f}};
+        // drawPoints(UPPER_BODY_POINTS, GL_LINE_LOOP);
 
-    drawPoints(points, GL_LINE_STRIP);
+        // glColor3ub(186, 144, 106);
+        // glPushMatrix();
+        // glScalef(0.7f, 0.7f, 1.0f);
+        //     drawPoints(UPPER_BODY_POINTS, GL_POLYGON);
+        // glPopMatrix();
+
+        // // LOWERBODY
+        // glColor3f(0, 0, 0);  
+        // vector<vector<float>> LOWER_BODY_POINTS = {{-1.11f,-4.5f}, {1.11,-4.5} };
+        // drawPoints(LOWER_BODY_POINTS, GL_LINE_LOOP);
+
+        // glColor3ub(186, 144, 106);
+        // glPushMatrix();
+        // glScalef(0.9f, 0.9f, 1.0f);
+        //     drawPoints(LOWER_BODY_POINTS, GL_POLYGON);
+        // glPopMatrix();
+
+        vector<vector<float>> BULLET_POINTS = {
+            { 0.001f, -1.151f }, { -0.297f, -1.149f }, { -0.3f, -1.06f },
+            { -0.383f, -0.887f }, { -0.461f, -0.8876f }, { -0.4653f, 0.3798f },
+            { -0.38f, 0.38f },   { -0.3796f, 0.636f }, { -0.294f, 0.636f },
+            { -0.2944f, 0.806f }, { -0.2104f, 0.806f }, { -0.2104f, 0.9776f },
+            { -0.126f, 0.9773f }, { -0.126f, 1.062f },  { -0.0426f, 1.0625f },
+            { -0.0426f, 1.149f }, { 0.0f, 1.15f },
+            { 0.0426f, 1.149f }, { 0.0426f, 1.0625f }, { 0.126f, 1.062f },
+            { 0.126f, 0.9773f }, { 0.2104f, 0.9776f }, { 0.2104f, 0.806f },
+            { 0.2944f, 0.806f }, { 0.294f, 0.636f },   { 0.3796f, 0.636f },
+            { 0.38f, 0.38f }, { 0.4653f, 0.3798f }, { 0.461f, -0.8876f },
+        };
+        glPushMatrix();
+        glScalef(1, 1, 1.0f);
+            drawPoints(BULLET_POINTS, GL_LINE_LOOP);
+        glPopMatrix();
+        
 
     glutSwapBuffers();
 }
@@ -102,6 +140,8 @@ void animate(int)
     glutPostRedisplay();
     glutTimerFunc(1000/60, animate, 0);
 
+
+    
 
 }
 
