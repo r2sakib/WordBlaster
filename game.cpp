@@ -6,6 +6,7 @@
 #include <math.h>
 #include <string>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -22,7 +23,7 @@ const float GUN_Y = -80.0f;
 const float BOMB_RADIUS = 2.0f;
 const float BOMB_SPEED = 0.3f;
 
-const float BULLET_SPEED = 1.0f;
+const float BULLET_SPEED = 2.0f;
 
 struct RGB {
     int r, g, b;
@@ -160,6 +161,67 @@ class Text {
 
 };
 
+class Player {
+    public:
+        float x = PLAYER_X;
+        float y = PLAYER_Y;
+        float eyesAngle = 0;
+
+        Player(float x, float y) {
+            this->x = x;
+            this->y = y;
+        }
+
+        Player() {}
+
+        void draw() {
+            glPushMatrix();
+            glTranslatef(x, y, 0.0f);
+
+        
+            // LEFT LEG
+            glColor3ub(96, 57, 19);
+            drawElipse(-4.35f, -7.0f, 3.0f, 1.4f, GL_POLYGON);
+
+            glColor3ub(0,0,0);
+            glLineWidth(3);
+            drawElipse(-4.35f, -7.0f, 3.0f, 1.4f, GL_LINE_LOOP);
+
+            
+            // BODY
+            glColor3ub(255, 198, 43);
+            drawCircle(8, 0, 0, 0, 360, GL_POLYGON);
+
+            glColor3ub(0, 0, 0);
+            glLineWidth(3);
+            drawCircle(8.2, 0, 0, 0, 360, GL_LINE_LOOP);
+
+
+            // RIGHT LEG
+            glColor3ub(96,57,19);
+            drawElipse(4.35f, -7.0f, 3.0f, 1.4f, GL_POLYGON);
+
+            glColor3ub(0,0,0);
+            glLineWidth(3);
+            drawElipse(4.35f, -7.0f, 3.0f, 1.4f, GL_LINE_LOOP);
+
+            glPushMatrix();
+            glTranslatef(eyesAngle, 2.5, 0);
+                // LEFT EYES
+                drawElipse(2.0f, 0.0f, 0.78f, 1.65f, GL_POLYGON);
+
+                // RIGHT EYES
+                drawElipse(-2.0f, 0.0f, 0.78f, 1.65f, GL_POLYGON);
+            glPopMatrix();
+
+            glPopMatrix();
+        }
+
+        void animate(float targetAngle) {
+            eyesAngle = 3.0f * cos(targetAngle);
+        }
+};
+
 class Bomb {
     public:
         float radius;
@@ -295,7 +357,6 @@ class Bomb {
         }
 };
 
-
 class Bullet {
     public:
         float x = GUN_X;
@@ -304,16 +365,19 @@ class Bullet {
         bool active = true;
         float angleOfAttack_deg = 0.0f;
 
+        Player* player;
         Bomb* targetBomb;
 
-        Bullet(Bomb* targetBomb, float x=GUN_X, float y=GUN_Y) {
+        Bullet(Bomb* targetBomb, Player* player, float x=GUN_X, float y=GUN_Y) {
             this->x = x;
             this->y = y;
 
             float angleOfAttack_rad = atan2((targetBomb->y - y), (targetBomb->x - x));
-            angleOfAttack_deg = (angleOfAttack_rad * (180.0f / PI)) -90.0f;
+            angleOfAttack_deg = (angleOfAttack_rad * (180.0f / PI));
 
             this->targetBomb = targetBomb;
+            this->player = player;
+            player->animate(angleOfAttack_rad);
         }
 
         Bullet() {};
@@ -327,7 +391,7 @@ class Bullet {
             };
             glPushMatrix();
             glTranslatef(x, y, 0.0f);
-            glRotatef(angleOfAttack_deg, 0, 0.0f, 1.0f);
+            glRotatef(angleOfAttack_deg -90.0f, 0, 0.0f, 1.0f);
 
             glPushMatrix();
             glScalef(1.5, 1.5, 1.0f);
@@ -367,56 +431,4 @@ class Bullet {
         }
 };
 
-class Player {
-    public:
-        float x = PLAYER_X;
-        float y = PLAYER_Y;
 
-        Player(float x, float y) {
-            this->x = x;
-            this->y = y;
-        }
-
-        Player() {}
-
-        void draw() {
-            glPushMatrix();
-            glTranslatef(x, y, 0.0f);
-
-        
-            // LEFT LEG
-            glColor3ub(96, 57, 19);
-            drawElipse(-4.35f, -7.0f, 3.0f, 1.4f, GL_POLYGON);
-
-            glColor3ub(0,0,0);
-            glLineWidth(3);
-            drawElipse(-4.35f, -7.0f, 3.0f, 1.4f, GL_LINE_LOOP);
-
-            
-            // BODY
-            glColor3ub(255, 198, 43);
-            drawCircle(8, 0, 0, 0, 360, GL_POLYGON);
-
-            glColor3ub(0, 0, 0);
-            glLineWidth(3);
-            drawCircle(8.2, 0, 0, 0, 360, GL_LINE_LOOP);
-
-
-            // RIGHT LEG
-            glColor3ub(96,57,19);
-            drawElipse(4.35f, -7.0f, 3.0f, 1.4f, GL_POLYGON);
-
-            glColor3ub(0,0,0);
-            glLineWidth(3);
-            drawElipse(4.35f, -7.0f, 3.0f, 1.4f, GL_LINE_LOOP);
-
-            
-            // LEFT EYES
-            drawElipse(2.0f, 0.0f, 0.78f, 1.65f, GL_POLYGON);
-
-            // RIGHT EYES
-            drawElipse(-2.0f, 0.0f, 0.78f, 1.65f, GL_POLYGON);
-
-            glPopMatrix();
-        }
-};
