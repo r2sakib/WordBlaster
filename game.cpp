@@ -18,7 +18,7 @@ const float PLAYER_Y = -80.0f;
 const float PLAYER_RADIUS = 8.2f;
 int lives = 3;
 
-const float GUN_X = 0.0f;
+const float GUN_X = 9.0f;
 const float GUN_Y = -80.0f;
 
 const float BOMB_RADIUS = 2.0f;
@@ -153,16 +153,17 @@ class Text {
 
 class Player {
     public:
-        float x = PLAYER_X;
-        float y = PLAYER_Y;
-        float eyesAngle = 0;
+        float x;
+        float y;
+        float eyesAngle;
 
-        Player(float x, float y) {
+        Player(float x=PLAYER_X, float y=PLAYER_Y, float eyesAngle=45) {
             this->x = x;
             this->y = y;
+            this->eyesAngle = 3.0f * cos(eyesAngle);
         }
 
-        Player() {}
+        // Player() {}
 
         void draw() {
             glPushMatrix();
@@ -226,42 +227,42 @@ class Bomb {
         int explosionFrame = 0;
 
         static void BOMB_DESIGN() {
-                // BOMB SPARK
-                vector<vector<float>> BOMB_SPARK_POINTS = {
-                    {5.9f, 7.5f},{5.74f, 7.27f},{ 5.613f, 7.06f}, {5.52f, 6.74f},{5.5f ,6.5f} ,{5.5f, 6.3f} ,{5.68f ,6.55f} ,
-                    {5.9f ,6.8f }, {6.067f,6.975f}, {6.31f ,7.15f} ,{6.6f , 7.3f} ,{6.95f,7.374f}, {7.26f,7.3f},{7.52f ,7.34f} ,
-                    {7.66f,7.216f},{7.493f,7.17f}, {7.306f,7.053f} ,{7.064f, 6.914f} , {6.87f ,6.727f} ,{6.69f, 6.44f},{6.53f,6.19f},
-                    {6.416f,5.939f},{6.344f,5.705f},{ 6.33f, 5.54f}, { 6.56f, 5.624f }, { 6.8f, 5.76f }, { 7.0f ,5.9f }, {7.125f, 6.06f}, 
-                    {7.247f,6.18f},{ 7.37f,6.415f}, {7.48f ,6.233f},{7.498f,6.096f},{7.5f,6.0f}
-                };
+            // BOMB SPARK
+            vector<vector<float>> BOMB_SPARK_POINTS = {
+                {5.9f, 7.5f},{5.74f, 7.27f},{ 5.613f, 7.06f}, {5.52f, 6.74f},{5.5f ,6.5f} ,{5.5f, 6.3f} ,{5.68f ,6.55f} ,
+                {5.9f ,6.8f }, {6.067f,6.975f}, {6.31f ,7.15f} ,{6.6f , 7.3f} ,{6.95f,7.374f}, {7.26f,7.3f},{7.52f ,7.34f} ,
+                {7.66f,7.216f},{7.493f,7.17f}, {7.306f,7.053f} ,{7.064f, 6.914f} , {6.87f ,6.727f} ,{6.69f, 6.44f},{6.53f,6.19f},
+                {6.416f,5.939f},{6.344f,5.705f},{ 6.33f, 5.54f}, { 6.56f, 5.624f }, { 6.8f, 5.76f }, { 7.0f ,5.9f }, {7.125f, 6.06f}, 
+                {7.247f,6.18f},{ 7.37f,6.415f}, {7.48f ,6.233f},{7.498f,6.096f},{7.5f,6.0f}
+            };
 
-                glLineWidth(1);
-                glColor3ub(0,0,0);
-                drawPoints(BOMB_SPARK_POINTS, GL_LINE_STRIP);
+            glLineWidth(1);
+            glColor3ub(0,0,0);
+            drawPoints(BOMB_SPARK_POINTS, GL_LINE_STRIP);
 
-                drawCircle(1.5f, 6.0f, 6.0f, 90, 360, GL_LINE_STRIP);
+            drawCircle(1.5f, 6.0f, 6.0f, 90, 360, GL_LINE_STRIP);
 
 
-                glColor3ub(255, 0, 0);
-                drawCircle(1.2f, 6.0f, 6.0f, 90, 360, GL_POLYGON);
+            glColor3ub(255, 0, 0);
+            drawCircle(1.2f, 6.0f, 6.0f, 90, 360, GL_POLYGON);
 
-                // BOMB HEAD
-                vector<vector<float>> BOMB_HEAD_POINTS = {
-                    {2.85f,4.1f}, {4.24f,2.65f}, {5.0f,3.44f}, {3.578f,4.83f}
-                };
+            // BOMB HEAD
+            vector<vector<float>> BOMB_HEAD_POINTS = {
+                {2.85f,4.1f}, {4.24f,2.65f}, {5.0f,3.44f}, {3.578f,4.83f}
+            };
 
-                glColor3ub(0,0,0);
-                glLineWidth(3);
-                drawPoints(BOMB_HEAD_POINTS, GL_LINE_LOOP);
-                drawPoints(BOMB_HEAD_POINTS, GL_POLYGON);
+            glColor3ub(0,0,0);
+            glLineWidth(3);
+            drawPoints(BOMB_HEAD_POINTS, GL_LINE_LOOP);
+            drawPoints(BOMB_HEAD_POINTS, GL_POLYGON);
 
-                // BOMB BODY
-                glColor3ub(88,88,90);
-                drawCircle(5, 0, 0, 0, 360, GL_POLYGON);
+            // BOMB BODY
+            glColor3ub(88,88,90);
+            drawCircle(5, 0, 0, 0, 360, GL_POLYGON);
 
-                glColor3ub(0,0,0);
-                glLineWidth(2);
-                drawCircle(5, 0, 0, 0, 360, GL_LINE_LOOP);
+            glColor3ub(0,0,0);
+            glLineWidth(2);
+            drawCircle(5, 0, 0, 0, 360, GL_LINE_LOOP);
         }
 
 
@@ -370,18 +371,93 @@ class Bomb {
         }
 };
 
+
+class Gun {
+    public:
+    float x, y;
+    float angleOfAttack;
+
+    Gun (float x=GUN_X, float y=GUN_Y, float angleOfAttack=45) {
+        this->x = x;
+        this->y = y;
+        this->angleOfAttack = angleOfAttack;
+    }
+
+    // Gun () {};
+
+    void draw() {
+        glPushMatrix();
+        
+        float displayAngle = angleOfAttack;
+        x = GUN_X;
+        bool shouldFlip = abs(angleOfAttack) > 90;
+        
+        if (shouldFlip) {
+            displayAngle = 180.0f - angleOfAttack;
+            x = -GUN_X;
+        }
+        
+        glTranslatef(x, y, 0);
+
+        if (shouldFlip)
+            glScalef(-1.0f, 1.0f, 1.0f); 
+
+        glRotatef(displayAngle, 0, 0, 1);
+        
+
+        // GUN STOCK
+        vector<vector<float>> GUN_STOCK_POINTS = {
+            {-8.76f, -0.84f},   {-15.06f, 0.2f},    {-15.12f, -5.13f}, {-8.73f, -2.18f},
+            {-6.87f, -2.78f},   {-3.56f, -0.01f},   {-4.811f, 1.77f},  {-7.1f, 0.5f},
+            {-8.83f, 0.88f},    {-15.06f, 0.2f}
+        };
+        glColor3ub(81, 49, 42);
+        drawPoints(GUN_STOCK_POINTS, GL_TRIANGLE_FAN);
+        
+        // GUN BARREL
+        vector<vector<float>> GUN_BARREL_POINTS = {
+            {-3.56f, -0.01f}, {7.5f, 0.0f},   {8.62f, 1.4f},  {15.92f, 1.4f},
+            {15.92f, 2.62f},  {-3.45f, 2.7f},  {-4.811f, 1.77f}
+        };
+        glColor3ub(189, 190, 192);
+        drawPoints(GUN_BARREL_POINTS, GL_POLYGON);
+
+        // GUN OUTLINE
+        std::vector<std::vector<float>> GUN_OUTLINE_POINTS = {
+            {-15.06f, 0.2f},  {-15.12f, -5.13f}, {-8.73f, -2.18f}, {-6.87f, -2.78f},
+            {-3.56f, -0.01f}, {7.5f, 0.0f},      {8.62f, 1.4f},   {15.92f, 1.4f},
+            {15.92f, 2.62f},  {-3.45f, 2.7f},     {-7.1f, 0.2f},   {-8.83f, 0.88f}
+        };
+        glColor3ub(0,0,0);
+        glLineWidth(1.5);
+        drawPoints(GUN_OUTLINE_POINTS, GL_LINE_LOOP);
+
+        //TRIGGER
+        drawCircle(1.4, 0, 0, 180, 360, GL_LINE_LOOP);
+        glPopMatrix();
+    }
+
+    float animate (float angleOfAttack) {
+        this->angleOfAttack = angleOfAttack;
+        draw();
+        return x;
+    }
+};
+
+
 class Bullet {
     public:
-        float x = GUN_X;
-        float y = GUN_Y;
+        float x;
+        float y;
         float radius = 0.3f;
         bool active = true;
         float angleOfAttack_deg = 0.0f;
 
         Player* player;
         Bomb* targetBomb;
+        Gun* gun;
 
-        Bullet(Bomb* targetBomb, Player* player, float x=GUN_X, float y=GUN_Y) {
+        Bullet(Bomb* targetBomb, Player* player, Gun* gun, float x=GUN_X, float y=GUN_Y) {
             this->x = x;
             this->y = y;
 
@@ -391,6 +467,7 @@ class Bullet {
             this->targetBomb = targetBomb;
             this->player = player;
             player->animate(angleOfAttack_rad);
+            this->x = gun->animate(angleOfAttack_deg);
         }
 
         Bullet() {};
@@ -444,3 +521,4 @@ class Bullet {
 
         }
 };
+

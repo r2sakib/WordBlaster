@@ -16,6 +16,7 @@ void keyboard(unsigned char key, int x, int y);
 
 
 Player player = Player();
+Gun gun = Gun();
 vector<Bomb> bombs;
 vector<Bullet> bullets;
 
@@ -57,17 +58,20 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
-    player.draw();
     // bomb.draw();
     // bullet1.draw();
-
+    
     for (int i = 0; i < bombs.size(); i++) {
         bombs[i].draw();
     }
-
+    
     for (int i = 0; i < bullets.size(); i++) {
         bullets[i].draw();
     }
+
+    gun.draw();
+    
+    player.draw();
 
 
     glutSwapBuffers();
@@ -107,7 +111,7 @@ void keyboard(unsigned char key, int x, int y) {
 
     else {
         if (bombs.size() > 0) {
-            Bullet newBullet(&bombs[key-48], &player);
+            Bullet newBullet(&bombs[key-48], &player, &gun);
             bullets.push_back(newBullet);
         }
     }

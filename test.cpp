@@ -78,82 +78,45 @@ void drawPoints(const vector<vector<float>>& points, int primative)
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
-        // HEAD
-        glColor3f(0, 0, 0);  
-        // glLineWidth(1.5);
 
-        // drawElipse(0.0f, 0.0f, 0.65f, 2.5f, GL_LINE_LOOP, 0.95f);
-        
-        // glColor3ub(163, 110, 91);
-        // glPushMatrix();
-        // glScalef(0.9f, 0.9f, 1.0f);
-        //     drawElipse(0.0f, 0.0f, 0.65f, 2.5f, GL_POLYGON, 0.95f);
-        // glPopMatrix();
-
-        // // UPERBODY
-        // glColor3f(0, 0, 0);  
-        // vector<vector<float>> UPPER_BODY_POINTS = {
-        //     {-1.11f,1.0f}, {-1.11f,-4.5f}, {-1.6f,-5.2f}, {1.6f,-5.2f}, {1.11f,-4.5f}, {1.11f,1.0f}};
-        // drawPoints(UPPER_BODY_POINTS, GL_LINE_LOOP);
-
-        // glColor3ub(186, 144, 106);
-        // glPushMatrix();
-        // glScalef(0.7f, 0.7f, 1.0f);
-        //     drawPoints(UPPER_BODY_POINTS, GL_POLYGON);
-        // glPopMatrix();
-
-        // // LOWERBODY
-        // glColor3f(0, 0, 0);  
-        // vector<vector<float>> LOWER_BODY_POINTS = {{-1.11f,-4.5f}, {1.11,-4.5} };
-        // drawPoints(LOWER_BODY_POINTS, GL_LINE_LOOP);
-
-        // glColor3ub(186, 144, 106);
-        // glPushMatrix();
-        // glScalef(0.9f, 0.9f, 1.0f);
-        //     drawPoints(LOWER_BODY_POINTS, GL_POLYGON);
-        // glPopMatrix();
-
-        vector<std::vector<float>> EXPLOSION_POINTS = {
-                {-2.8f, 0.0f},    {-0.577f, -0.36f},  {-1.777f, -1.575f}, {-0.12f, -0.536f},
-                {0.34f, -1.533f}, {0.44f, -0.134f},   {1.8f, -0.7f},      {1.0f, 0.2f},
-                {1.754f, 0.664f}, {0.726f, 0.635f},   {0.6f, 1.3f},       {0.04f, 0.56f},
-                {-1.04f, 1.014f}, {-0.5f, 0.1f}
-        };
-
-        glColor3f(0, 0, 0);
-        glLineWidth(1.5);
-        drawPoints(EXPLOSION_POINTS, GL_LINE_LOOP);
-        
+        //GUN
         glPushMatrix();
-        glScalef(0.9, 0.9, 1.0f);
-            glColor3f(255, 0, 0);
-            glBegin(GL_TRIANGLE_FAN);
-            glVertex2f(0.0f, 0.0f); 
+        glScalef(5, 5, 1);
 
-            for (const auto& point : EXPLOSION_POINTS) {
-                glVertex2f(point[0], point[1]);
-            }
 
-            glVertex2f(EXPLOSION_POINTS[0][0], EXPLOSION_POINTS[0][1]);
-        glEnd();
+        // GUN STOCK
+        vector<vector<float>> GUN_STOCK_POINTS = {
+            {-8.76f, -0.84f},   {-15.06f, 0.2f},    {-15.12f, -5.13f}, {-8.73f, -2.18f},
+            {-6.87f, -2.78f},   {-3.56f, -0.01f},   {-4.811f, 1.77f},  {-7.1f, 0.5f},
+            {-8.83f, 0.88f},    {-15.06f, 0.2f}
+        };
+        glColor3ub(81, 49, 42);
+        drawPoints(GUN_STOCK_POINTS, GL_TRIANGLE_FAN);
+        
+        // GUN BARREL
+        vector<vector<float>> GUN_BARREL_POINTS = {
+            {-3.56f, -0.01f}, {7.5f, 0.0f},   {8.62f, 1.4f},  {15.92f, 1.4f},
+            {15.92f, 2.62f},  {-3.45f, 2.7f},  {-4.811f, 1.77f}
+        };
+        glColor3ub(189, 190, 192);
+        drawPoints(GUN_BARREL_POINTS, GL_POLYGON);
+
+        // GUN OUTLINE
+        std::vector<std::vector<float>> GUN_OUTLINE_POINTS = {
+            {-15.06f, 0.2f},  {-15.12f, -5.13f}, {-8.73f, -2.18f}, {-6.87f, -2.78f},
+            {-3.56f, -0.01f}, {7.5f, 0.0f},      {8.62f, 1.4f},   {15.92f, 1.4f},
+            {15.92f, 2.62f},  {-3.45f, 2.7f},     {-7.1f, 0.2f},   {-8.83f, 0.88f}
+        };
+        glColor3ub(0,0,0);
+        glLineWidth(1.5);
+        drawPoints(GUN_OUTLINE_POINTS, GL_LINE_LOOP);
+        
+
+        //TRIGGER
+        drawCircle(1.4, 0, 0, 180, 360, GL_LINE_LOOP);
+
+
         glPopMatrix();
-
-        // glPopMatrix();
-
-        // glPushMatrix();
-        // glScalef(10, 10, 1.0f);
-        // glBegin(GL_TRIANGLE_FAN);
-        //     glVertex2f(0.0f, 0.0f); 
-
-        //     for (const float* point : EXPLOSION_POINTS) {
-        //         glVertex2f(point[0], point[1]);
-        //     }
-
-        //     glVertex2f(EXPLOSION_POINTS[0][0], EXPLOSION_POINTS[0][1]);
-        // glEnd()
-        // glPopMatrix();
-
-    glEnd();
         
 
     glutSwapBuffers();
