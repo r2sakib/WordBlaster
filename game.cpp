@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <random>
 
 using namespace std;
 
@@ -22,6 +23,8 @@ const float GUN_Y = -80.0f;
 
 const float BOMB_RADIUS = 2.0f;
 const float BOMB_SPEED = 0.3f;
+float BOMB_EXPLOSION_MAX_RADIUS = 6.0f;
+
 
 const float BULLET_SPEED = 2.0f;
 
@@ -30,6 +33,7 @@ struct RGB {
 };
 
 RGB TEXT_COLOR = {0, 0, 0};
+// RGB EXPLOSION_COLOR = {255, 0, 0};
 
 
 void drawCircle(float radius, float xc, float yc, float startAngle, float endAngle, int primative=GL_LINE_LOOP)
@@ -71,20 +75,6 @@ void drawPoints(const vector<vector<float>>& points, int primative)
             glVertex2f(points[i][0], points[i][1]);
         }
     glEnd();
-}
-
-float* getLineEqn(float x1, float y1, float x2, float y2)
-{
-    // vector<float> coeffs(2);
-    float* coeffs = new float[2];
-    coeffs[0] = (y2 - y1) / (x2 - x1); // m
-    coeffs[1] = y1 - coeffs[0] * x1;   // b
-    return coeffs;
-}
-
-float linearInterpolate(float start, float end, float t)
-{
-    return (1 - t) * start + t * end;
 }
 
 float* drawParabola(float eqn_xCoeff, float eqn_const, float startX, float endX)
@@ -232,7 +222,6 @@ class Bomb {
         bool exploding = false;
         bool explosionFinished = false;
         float explosionRadius = radius;
-        float explosionMaxRadius = 7.0f;
         int explosionDuration = 60;
         int explosionFrame = 0;
 
@@ -241,7 +230,7 @@ class Bomb {
                 vector<vector<float>> BOMB_SPARK_POINTS = {
                     {5.9f, 7.5f},{5.74f, 7.27f},{ 5.613f, 7.06f}, {5.52f, 6.74f},{5.5f ,6.5f} ,{5.5f, 6.3f} ,{5.68f ,6.55f} ,
                     {5.9f ,6.8f }, {6.067f,6.975f}, {6.31f ,7.15f} ,{6.6f , 7.3f} ,{6.95f,7.374f}, {7.26f,7.3f},{7.52f ,7.34f} ,
-                    {7.66f,7.216f} ,{7.493f,7.17f}, {7.306f,7.053f} ,{7.064f, 6.914f} , {6.87f ,6.727f} ,{6.69f, 6.44f},{6.53f,6.19f},
+                    {7.66f,7.216f},{7.493f,7.17f}, {7.306f,7.053f} ,{7.064f, 6.914f} , {6.87f ,6.727f} ,{6.69f, 6.44f},{6.53f,6.19f},
                     {6.416f,5.939f},{6.344f,5.705f},{ 6.33f, 5.54f}, { 6.56f, 5.624f }, { 6.8f, 5.76f }, { 7.0f ,5.9f }, {7.125f, 6.06f}, 
                     {7.247f,6.18f},{ 7.37f,6.415f}, {7.48f ,6.233f},{7.498f,6.096f},{7.5f,6.0f}
                 };
@@ -253,7 +242,7 @@ class Bomb {
                 drawCircle(1.5f, 6.0f, 6.0f, 90, 360, GL_LINE_STRIP);
 
 
-                glColor3ub(255,0,0);
+                glColor3ub(255, 0, 0);
                 drawCircle(1.2f, 6.0f, 6.0f, 90, 360, GL_POLYGON);
 
                 // BOMB HEAD
@@ -274,6 +263,8 @@ class Bomb {
                 glLineWidth(2);
                 drawCircle(5, 0, 0, 0, 360, GL_LINE_LOOP);
         }
+
+
 
         Text text;
 
@@ -303,15 +294,37 @@ class Bomb {
         {
             if (explosionFinished) return;
 
+            // BOBM EXPLOSION
             if (exploding) {
-                float t = (float)explosionFrame / (float)max(1, explosionDuration);
-                float curR = explosionRadius + t * (explosionMaxRadius - explosionRadius);
-                GLubyte alpha = (GLubyte)(255 * (1.0f - t));
+                float t = (float)explosionFrame / explosionDuration;
+                float peakT = 0.3f;
+
+                float outerRadius;
+                float innerRadius;
+                GLubyte alpha = ((1 - t) * 255);
 
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                     glColor4ub(255, 0, 0, alpha);
-                    drawCircle(curR, x, y, 0, 360, GL_POLYGON);
+                        if (t < peakT) {
+                            float t1 = t / peakT;
+                            outerRadius = 0.0f + t1 * (BOMB_EXPLOSION_MAX_RADIUS - 0.0f);
+
+                        } else {
+                            float t2 = (t - peakT) / (1.0f - peakT);
+                            outerRadius = BOMB_EXPLOSION_MAX_RADIUS + t2 * (0.0f - BOMB_EXPLOSION_MAX_RADIUS);
+                        }
+
+                        innerRadius = outerRadius / 2.0f;
+
+                        glBegin(GL_TRIANGLE_FAN);
+                            glVertex2f(x, y);
+                            for (int i = 0; i <= 360; i += 30) {
+                                float rad = i * PI / 180.0f;
+                                float r = (i % 60 == 0) ? outerRadius : innerRadius; 
+                                glVertex2f(x + r * cos(rad), y + r * sin(rad));
+                            }
+                        glEnd();
                 glDisable(GL_BLEND);
             }
             else {
@@ -409,7 +422,8 @@ class Bullet {
         }
 
         void animate() {
-            if (!active || targetBomb->isDone()) return;
+            if (!active || targetBomb->isDone()) 
+                return;
 
             // ANIMATION MATH
             float dirX = targetBomb->x - x;
@@ -430,5 +444,3 @@ class Bullet {
 
         }
 };
-
-

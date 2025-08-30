@@ -113,22 +113,47 @@ void display() {
         //     drawPoints(LOWER_BODY_POINTS, GL_POLYGON);
         // glPopMatrix();
 
-        vector<vector<float>> BULLET_POINTS = {
-            { 0.001f, -1.151f }, { -0.297f, -1.149f }, { -0.3f, -1.06f },
-            { -0.383f, -0.887f }, { -0.461f, -0.8876f }, { -0.4653f, 0.3798f },
-            { -0.38f, 0.38f },   { -0.3796f, 0.636f }, { -0.294f, 0.636f },
-            { -0.2944f, 0.806f }, { -0.2104f, 0.806f }, { -0.2104f, 0.9776f },
-            { -0.126f, 0.9773f }, { -0.126f, 1.062f },  { -0.0426f, 1.0625f },
-            { -0.0426f, 1.149f }, { 0.0f, 1.15f },
-            { 0.0426f, 1.149f }, { 0.0426f, 1.0625f }, { 0.126f, 1.062f },
-            { 0.126f, 0.9773f }, { 0.2104f, 0.9776f }, { 0.2104f, 0.806f },
-            { 0.2944f, 0.806f }, { 0.294f, 0.636f },   { 0.3796f, 0.636f },
-            { 0.38f, 0.38f }, { 0.4653f, 0.3798f }, { 0.461f, -0.8876f },
+        vector<std::vector<float>> EXPLOSION_POINTS = {
+                {-2.8f, 0.0f},    {-0.577f, -0.36f},  {-1.777f, -1.575f}, {-0.12f, -0.536f},
+                {0.34f, -1.533f}, {0.44f, -0.134f},   {1.8f, -0.7f},      {1.0f, 0.2f},
+                {1.754f, 0.664f}, {0.726f, 0.635f},   {0.6f, 1.3f},       {0.04f, 0.56f},
+                {-1.04f, 1.014f}, {-0.5f, 0.1f}
         };
+
+        glColor3f(0, 0, 0);
+        glLineWidth(1.5);
+        drawPoints(EXPLOSION_POINTS, GL_LINE_LOOP);
+        
         glPushMatrix();
-        glScalef(1, 1, 1.0f);
-            drawPoints(BULLET_POINTS, GL_LINE_LOOP);
+        glScalef(0.9, 0.9, 1.0f);
+            glColor3f(255, 0, 0);
+            glBegin(GL_TRIANGLE_FAN);
+            glVertex2f(0.0f, 0.0f); 
+
+            for (const auto& point : EXPLOSION_POINTS) {
+                glVertex2f(point[0], point[1]);
+            }
+
+            glVertex2f(EXPLOSION_POINTS[0][0], EXPLOSION_POINTS[0][1]);
+        glEnd();
         glPopMatrix();
+
+        // glPopMatrix();
+
+        // glPushMatrix();
+        // glScalef(10, 10, 1.0f);
+        // glBegin(GL_TRIANGLE_FAN);
+        //     glVertex2f(0.0f, 0.0f); 
+
+        //     for (const float* point : EXPLOSION_POINTS) {
+        //         glVertex2f(point[0], point[1]);
+        //     }
+
+        //     glVertex2f(EXPLOSION_POINTS[0][0], EXPLOSION_POINTS[0][1]);
+        // glEnd()
+        // glPopMatrix();
+
+    glEnd();
         
 
     glutSwapBuffers();
