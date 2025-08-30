@@ -151,6 +151,7 @@ class Text {
 
 };
 
+
 class Player {
     public:
         float x;
@@ -212,6 +213,7 @@ class Player {
             eyesAngle = 3.0f * cos(targetAngle);
         }
 };
+
 
 class Bomb {
     public:
@@ -492,7 +494,8 @@ class Bullet {
 
             glPushMatrix();
             glScalef(1.4, 1.4, 1.0f);
-                glColor3ub(252, 91, 40);
+                // glColor3ub(252, 91, 40);
+                glColor3ub(66, 73, 89);
                 drawPoints(BULLET_POINTS, GL_POLYGON);
             glPopMatrix();
             glPopMatrix();
