@@ -22,6 +22,7 @@ Background background = Background();
 Player player = Player();
 Gun gun = Gun();
 Word word = Word(WORDS_FILE_PATH);
+GameOver gameOver = GameOver();
 
 
 vector<Bomb> bombs;
@@ -102,22 +103,18 @@ void display() {
     for (int i = TOTAL_LIVES-1; i >= TOTAL_LIVES-livesLeft; i--) {
         lifeStars[i].draw();
     }
+    
+    
+    gun.draw();
+    player.draw();
 
+    // Draw Score
     Text scoreTxt(to_string(score), -175, 93, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
     scoreTxt.draw();
 
     if (player.dead) {
-        Text gameOverTxt("GAME OVER", -15, 5, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
-        gameOverTxt.draw();
-
-        Text finalScoreTxt(to_string(score), 0, -5, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
-        finalScoreTxt.draw();
-
+        gameOver.draw();
     }
-    
-    gun.draw();
-    player.draw();
-    
 
 
     glutSwapBuffers();

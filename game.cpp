@@ -544,26 +544,48 @@ class Word {
         }
     }
 
-string getRandomWord(vector<Bomb> &currentBombs) {
-    if (words.empty()) {
-        return "";
-    }
+    string getRandomWord(vector<Bomb> &currentBombs) {
+        if (words.empty()) {
+            return "";
+        }
 
-    while (true) { 
-        int index = getRandomInt(0, words.size());
-        string newWord = words[index];
+        while (true) { 
+            int index = getRandomInt(0, words.size());
+            string newWord = words[index];
 
-        bool matchFound = false;
-        for (const Bomb &bomb : currentBombs) {
-            if (bomb.text.str[0] == newWord[0]) {
-                matchFound = true;
-                break;
+            bool matchFound = false;
+            for (const Bomb &bomb : currentBombs) {
+                if (bomb.text.str[0] == newWord[0]) {
+                    matchFound = true;
+                    break;
+                }
+            }
+
+            if (!matchFound) {
+                return newWord;
             }
         }
-
-        if (!matchFound) {
-            return newWord;
-        }
     }
-}
+};
+
+class GameOver {
+    public:
+        void draw() {
+            // To fade the gameplay (opacity lowered)
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glColor4f(0.0f, 0.0f, 0.0f, 0.30f);
+            glBegin(GL_QUADS);
+                glVertex2f(190, 100);
+                glVertex2f(190, -100);
+                glVertex2f(-190, -100);
+                glVertex2f(-190, 100);
+            glEnd();
+
+            Text gameOverTxt("GAME OVER", -15, 5, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
+            gameOverTxt.draw();
+
+            Text finalScoreTxt(to_string(score), 0, -5, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
+            finalScoreTxt.draw();
+        }
 };
