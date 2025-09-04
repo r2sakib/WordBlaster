@@ -15,6 +15,7 @@ void animate(int);
 void keyboard(unsigned char key, int x, int y);
 
 
+Background background = Background();
 Player player = Player();
 Gun gun = Gun();
 vector<Bomb> bombs;
@@ -34,7 +35,8 @@ int main(int argc, char** argv) {
     glutTimerFunc(1000, animate, 0);
     glutKeyboardFunc(keyboard);
 
-    glClearColor(1, 1, 1, 1);
+    // glClearColor(1, 1, 1, 1);
+    glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
 
     for (int i = 0; i < 5; i++) {
         vector<float> point = getRandomPoint();
@@ -50,16 +52,11 @@ int main(int argc, char** argv) {
 }
 
 
-// Text newText("word", 0, 0);
-// Bomb bomb(2, newText, -80, 80);
-// Bullet bullet1(&bombs[0]);
-
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
-    // bomb.draw();
-    // bullet1.draw();
+    background.draw();
     
     for (int i = 0; i < bombs.size(); i++) {
         bombs[i].draw();
@@ -69,8 +66,8 @@ void display() {
         bullets[i].draw();
     }
 
-    gun.draw();
     
+    gun.draw();
     player.draw();
 
 

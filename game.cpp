@@ -22,7 +22,7 @@ const float GUN_X = 9.0f;
 const float GUN_Y = -80.0f;
 
 const float BOMB_RADIUS = 2.0f;
-const float BOMB_SPEED = 0.3f;
+const float BOMB_SPEED = 0.2f;
 float BOMB_EXPLOSION_MAX_RADIUS = 6.0f;
 
 
@@ -33,7 +33,6 @@ struct RGB {
 };
 
 RGB TEXT_COLOR = {0, 0, 0};
-// RGB EXPLOSION_COLOR = {255, 0, 0};
 
 
 void drawCircle(float radius, float xc, float yc, float startAngle, float endAngle, int primative=GL_LINE_LOOP)
@@ -105,6 +104,7 @@ vector<float> getRandomPoint() {
 
     return {x, y};
 }
+
 
 class Text {
     public:
@@ -182,6 +182,7 @@ class Player {
             
             // BODY
             glColor3ub(255, 198, 43);
+            // glColor3ub(162, 162, 162);
             drawCircle(8, 0, 0, 0, 360, GL_POLYGON);
 
             glColor3ub(0, 0, 0);
@@ -300,7 +301,7 @@ class Bomb {
             // BOBM EXPLOSION
             if (exploding) {
                 float t = (float)explosionFrame / explosionDuration;
-                float peakT = 0.3f;
+                float peakT = 0.5f;
 
                 float outerRadius;
                 float innerRadius;
@@ -308,26 +309,30 @@ class Bomb {
 
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                    glColor4ub(255, 0, 0, alpha);
-                        if (t < peakT) {
-                            float t1 = t / peakT;
-                            outerRadius = 0.0f + t1 * (BOMB_EXPLOSION_MAX_RADIUS - 0.0f);
+                glColor4ub(255, 0, 0, alpha);
+                    if (t < peakT) {
+                        float t1 = t / peakT;
+                        outerRadius = 0.0f + t1 * (BOMB_EXPLOSION_MAX_RADIUS - 0.0f);
 
-                        } else {
-                            float t2 = (t - peakT) / (1.0f - peakT);
-                            outerRadius = BOMB_EXPLOSION_MAX_RADIUS + t2 * (0.0f - BOMB_EXPLOSION_MAX_RADIUS);
+                    } 
+                    else {
+                        float t2 = (t - peakT) / (1.0f - peakT);
+                        outerRadius = BOMB_EXPLOSION_MAX_RADIUS + t2 * (0.0f - BOMB_EXPLOSION_MAX_RADIUS);
+                    }
+
+                    innerRadius = outerRadius / 2.0f;
+
+                    glBegin(GL_TRIANGLE_FAN);
+                        glVertex2f(x, y);
+                        for (int i = 0; i <= 360; i += 30) {
+                            float rad = i * PI / 180.0f;
+                            float r = (i % 60 == 0) ? outerRadius : innerRadius; 
+                            glVertex2f(x + r * cos(rad), y + r * sin(rad));
                         }
+                    glEnd();
+                    // drawCircle(outerRadius, x, y, 0, 360, GL_POLYGON);
+                    // drawCircle(outerRadius, x, y, 0, 360, GL_POLYGON);
 
-                        innerRadius = outerRadius / 2.0f;
-
-                        glBegin(GL_TRIANGLE_FAN);
-                            glVertex2f(x, y);
-                            for (int i = 0; i <= 360; i += 30) {
-                                float rad = i * PI / 180.0f;
-                                float r = (i % 60 == 0) ? outerRadius : innerRadius; 
-                                glVertex2f(x + r * cos(rad), y + r * sin(rad));
-                            }
-                        glEnd();
                 glDisable(GL_BLEND);
             }
             else {
@@ -525,3 +530,74 @@ class Bullet {
         }
 };
 
+
+class Background {
+        public:
+
+        Background() {}
+
+    void drawRect(float x1, float y1, float x2, float y2, float r, float g, float b) {
+        glColor3f(r, g, b);
+        glBegin(GL_POLYGON);
+            glVertex2f(x1, y1);
+            glVertex2f(x2, y1);
+            glVertex2f(x2, y2);
+            glVertex2f(x1, y2);
+        glEnd();
+    }
+
+
+    void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, float r, float g, float b) {
+        glColor3f(r, g, b);
+        glBegin(GL_POLYGON);
+            glVertex2f(x1, y1);
+            glVertex2f(x2, y2);
+            glVertex2f(x3, y3);
+        glEnd();
+    }
+
+
+    void draw() {
+        glPushMatrix();
+        glScalef(190, 100, 0);
+
+        // Sky blocks
+        drawRect(-0.3f, 0.3f, -0.2f, 0.4f, 0.6f, 0.9f, 1.0f);
+        drawRect(0.2f, 0.4f, 0.3f, 0.5f, 0.6f, 0.9f, 1.0f);
+        drawRect(0.7f, 0.2f, 0.8f, 0.3f, 0.6f, 0.9f, 1.0f);
+
+        // Ground
+        drawRect(-1.0f, -1.0f, 1.0f, -0.5f, 0.76f, 0.60f, 0.42f);
+
+        // Ground blocks
+        drawRect(-0.9f, -0.9f, -0.8f, -0.8f, 0.85f, 0.70f, 0.50f);
+        drawRect(-0.5f, -0.95f, -0.3f, -0.85f, 0.85f, 0.70f, 0.50f);
+        drawRect(0.2f, -0.88f, 0.35f, -0.78f, 0.85f, 0.70f, 0.50f);
+        
+
+        // Grass blocks
+        drawRect(-0.7f, -0.7f, -0.6f, -0.6f, 0.2f, 0.8f, 0.2f);
+        drawRect(0.0f, -0.8f, 0.15f, -0.7f, 0.2f, 0.8f, 0.2f);
+        drawRect(0.6f, -0.75f, 0.75f, -0.65f, 0.2f, 0.8f, 0.2f);
+
+        // Clouds
+        drawRect(-0.7f, 0.6f, -0.5f, 0.7f, 1.0f, 1.0f, 1.0f);
+        drawRect(-0.65f, 0.7f, -0.4f, 0.8f, 1.0f, 1.0f, 1.0f);
+        drawRect(-0.6f, 0.65f, -0.45f, 0.75f, 0.9f, 0.9f, 0.9f);
+
+        drawRect(0.4f, 0.5f, 0.7f, 0.6f, 1.0f, 1.0f, 1.0f);
+        drawRect(0.5f, 0.6f, 0.8f, 0.7f, 1.0f, 1.0f, 1.0f);
+        drawRect(0.55f, 0.55f, 0.7f, 0.65f, 0.9f, 0.9f, 0.9f);
+
+        // // Tree 1
+        // drawRect(-0.2f, -0.5f, -0.15f, 0.0f, 0.55f, 0.27f, 0.07f); 
+        // // drawTriangle(-0.28f, -0.3f, -0.07f, -0.3f, -0.175f, -0.15f, 0.0f, 0.6f, 0.2f); 
+        // drawTriangle(-0.26f, -0.0f, -0.2f, -0.0f, -0.175f, -0.05f, 0.0f, 0.5f, 0.2f); 
+
+        // // Tree 2
+        // drawRect(0.5f, -0.5f, 0.55f, -0.3f, 0.55f, 0.27f, 0.07f);
+        // drawTriangle(0.42f, -0.3f, 0.63f, -0.3f, 0.525f, -0.15f, 0.0f, 0.6f, 0.2f);
+        // drawTriangle(0.44f, -0.2f, 0.61f, -0.2f, 0.525f, -0.05f, 0.0f, 0.5f, 0.2f); 
+        glPopMatrix();
+    }
+};
