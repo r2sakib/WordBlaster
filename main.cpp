@@ -18,6 +18,8 @@ void keyboard(unsigned char key, int x, int y);
 Background background = Background();
 Player player = Player();
 Gun gun = Gun();
+Life life = Life();
+
 vector<Bomb> bombs;
 vector<Bullet> bullets;
 
@@ -69,6 +71,7 @@ void display() {
     
     gun.draw();
     player.draw();
+    life.draw();
 
 
     glutSwapBuffers();

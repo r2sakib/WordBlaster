@@ -25,8 +25,9 @@ const float BOMB_RADIUS = 2.0f;
 const float BOMB_SPEED = 0.2f;
 float BOMB_EXPLOSION_MAX_RADIUS = 6.0f;
 
+const int TOTAL_LIVES = 3;
 
-const float BULLET_SPEED = 2.0f;
+const float BULLET_SPEED = 4.0f;
 
 struct RGB {
     int r, g, b;
@@ -91,6 +92,19 @@ float* drawParabola(float eqn_xCoeff, float eqn_const, float startX, float endX)
     yCoords[1] = y;
     return yCoords;
 }
+
+void drawStar(float x, float y, float outerRadius, float innerRadiusFactor=0.5) {
+    float innerRadius = outerRadius * innerRadiusFactor;
+    glBegin(GL_TRIANGLE_FAN);
+        glVertex2f(x, y);
+        for (int i = 0; i <= 360; i += 30) {
+            float rad = i * PI / 180.0f;
+            float r = (i % 60 == 0) ? outerRadius : innerRadius; 
+            glVertex2f(x + r * cos(rad), y + r * sin(rad));
+        }
+    glEnd();
+}
+
 
 vector<float> getRandomPoint() {
     static std::random_device rd;
@@ -301,7 +315,7 @@ class Bomb {
             // BOBM EXPLOSION
             if (exploding) {
                 float t = (float)explosionFrame / explosionDuration;
-                float peakT = 0.5f;
+                float peakT = 0.3f;
 
                 float outerRadius;
                 float innerRadius;
@@ -320,18 +334,8 @@ class Bomb {
                         outerRadius = BOMB_EXPLOSION_MAX_RADIUS + t2 * (0.0f - BOMB_EXPLOSION_MAX_RADIUS);
                     }
 
-                    innerRadius = outerRadius / 2.0f;
+                    drawStar(x, y, outerRadius);
 
-                    glBegin(GL_TRIANGLE_FAN);
-                        glVertex2f(x, y);
-                        for (int i = 0; i <= 360; i += 30) {
-                            float rad = i * PI / 180.0f;
-                            float r = (i % 60 == 0) ? outerRadius : innerRadius; 
-                            glVertex2f(x + r * cos(rad), y + r * sin(rad));
-                        }
-                    glEnd();
-                    // drawCircle(outerRadius, x, y, 0, 360, GL_POLYGON);
-                    // drawCircle(outerRadius, x, y, 0, 360, GL_POLYGON);
 
                 glDisable(GL_BLEND);
             }
@@ -601,3 +605,35 @@ class Background {
         glPopMatrix();
     }
 };
+
+
+class Life {
+    public:
+        int livesLeft;
+        Text lifeText;
+        vector<vector<float>> lifeStarPosition = {
+            {0, 0}, {6, 0}, {12, 0}
+        };
+    
+        Life (int totalLives=TOTAL_LIVES) {
+            this->livesLeft = 3;
+        }
+
+        void decrementLife(int value=1) {
+            livesLeft -= value;
+        }
+
+        void draw() {
+            for (int i = 0; i < livesLeft; i++) {
+                glPushMatrix();
+                glTranslatef(lifeStarPosition[i][0], lifeStarPosition[i][1], 1);
+                glRotatef(90, 0, 0, 1);
+                glColor3ub(255, 0, 0);
+                    drawStar(0, 0, 3, 0.4);
+                glPopMatrix();
+            }
+        }
+
+
+};
+
