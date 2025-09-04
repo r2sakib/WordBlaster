@@ -9,19 +9,26 @@
 
 using namespace std;
 
+
 void display();
 void reshape(int, int);
 void animate(int);
 void keyboard(unsigned char key, int x, int y);
+void sendBombs(int);
+void loadLives();
 
 
 Background background = Background();
 Player player = Player();
 Gun gun = Gun();
-Life life = Life();
+Word word = Word(WORDS_FILE_PATH);
+
 
 vector<Bomb> bombs;
 vector<Bullet> bullets;
+vector<LifeStar> lifeStars;
+
+string currentTypedStr;
 
 
 int main(int argc, char** argv) {
@@ -34,23 +41,42 @@ int main(int argc, char** argv) {
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    glutTimerFunc(1000, animate, 0);
+    glutTimerFunc(0, animate, 0);
     glutKeyboardFunc(keyboard);
+    animate(0);
 
-    // glClearColor(1, 1, 1, 1);
     glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
 
-    for (int i = 0; i < 5; i++) {
-        vector<float> point = getRandomPoint();
-        Text newText("word", 0, 0);
-        Bomb newBomb(2, newText, point[0], point[1]);
-        bombs.push_back(newBomb);
-    }
-    // bullet1 = Bullet(&bombs[0], &player);
+
+    word.loadWords();
+    loadLives();
+    sendBombs(0);
 
     glutMainLoop();
 
     return 0;
+}
+
+void sendBombs(int) {
+    if (livesLeft == 0)
+        return;
+
+    for (int i = 0; i < 5; i++) {
+        vector<float> point = getRandomPoint();
+        Text newWord(word.getRandomWord(bombs), 0, 0);
+        Bomb newBomb(2, newWord, point[0], point[1]);
+        bombs.push_back(newBomb);
+    }
+
+    glutTimerFunc(BOMB_WAVE_TIME_SEC*1000, sendBombs, 0);
+}
+
+
+void loadLives() {
+    for (auto lifeStarPosition : lifeStarPositions) {
+        LifeStar newLifeStar(lifeStarPosition[0], lifeStarPosition[1]);
+        lifeStars.push_back(newLifeStar);
+    }
 }
 
 
@@ -68,10 +94,14 @@ void display() {
         bullets[i].draw();
     }
 
+    // Decrement life
+    for (int i = TOTAL_LIVES-1; i >= TOTAL_LIVES-livesLeft; i--) {
+        lifeStars[i].draw();
+    }
     
     gun.draw();
     player.draw();
-    life.draw();
+    
 
 
     glutSwapBuffers();
@@ -83,39 +113,53 @@ void animate(int)
     glutPostRedisplay();
     glutTimerFunc(1000/60, animate, 0);
 
-    for (int i = 0; i < bombs.size(); i++) {
-        bombs[i].animate();
-        // if (bombs[i].isDone()) {
-        //     bombs.erase(bombs.begin() + i);
-        //     i--;
-        // }
+    if (livesLeft == 0) {
+        player.dead = true;
     }
 
-    for (int i = 0; i < bullets.size(); i++) {
-        bullets[i].animate();
-        // if (!bullets[i].active) {
-        //     bullets.erase(bullets.begin() + i);
-        //     i--;
-        // }
+    if (livesLeft > 0) {
+        for (int i = 0; i < bombs.size(); i++) {
+            bombs[i].animate();
+            if (bombs[i].isDone()) {
+                bombs.erase(bombs.begin() + i);
+                i--;
+            }
+        }
+
+        for (int i = 0; i < bullets.size(); i++) {
+            bullets[i].animate();
+            if (!bullets[i].active) {
+                bullets.erase(bullets.begin() + i);
+                i--;
+            }
+        }
     }
-    // bomb.animate();
-    // bullet1.animate();
 }
 
 
 void keyboard(unsigned char key, int x, int y) {
     // Exit full screen
-    if (key == 27) {
+    if (key == 27){
         exit(0);
+        return;
     }
 
-    else {
-        if (bombs.size() > 0) {
-            Bullet newBullet(&bombs[key-48], &player, &gun);
+    // Go to next word when space is pressed
+    if (key == 32) {
+        currentTypedStr = "";
+        return;
+    }
+    
+    currentTypedStr += key;
+    for (Bomb &bomb : bombs) {
+        if (bomb.text.str == currentTypedStr) {
+            currentTypedStr = "";
+            Bullet newBullet(&bomb, &player, &gun);
             bullets.push_back(newBullet);
         }
     }
-    
+    if (currentTypedStr.length() > 5)
+        currentTypedStr = "";
 }
 
 void reshape(int w, int h) {

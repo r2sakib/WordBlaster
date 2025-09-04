@@ -1,123 +1,17 @@
 #pragma once
 
-#include <windows.h>
 #include <GL/glut.h>
-#include <stdlib.h>
 #include <math.h>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <random>
+#include <fstream>
 
 using namespace std;
 
-const float PI = 3.14159265359;
-
-const float PLAYER_X = 0.0f;
-const float PLAYER_Y = -80.0f;
-const float PLAYER_RADIUS = 8.2f;
-int lives = 3;
-
-const float GUN_X = 9.0f;
-const float GUN_Y = -80.0f;
-
-const float BOMB_RADIUS = 2.0f;
-const float BOMB_SPEED = 0.2f;
-float BOMB_EXPLOSION_MAX_RADIUS = 6.0f;
-
-const int TOTAL_LIVES = 3;
-
-const float BULLET_SPEED = 4.0f;
-
-struct RGB {
-    int r, g, b;
-};
-
-RGB TEXT_COLOR = {0, 0, 0};
-
-
-void drawCircle(float radius, float xc, float yc, float startAngle, float endAngle, int primative=GL_LINE_LOOP)
-{
-    glBegin(primative);
-        for(int i = startAngle; i < endAngle; i++)
-        {
-            float pi = 3.14159265359;
-            float A = (i*2*pi)/360;
-            float x = radius * cos(A);
-            float y = radius * sin(A);
-            glVertex2f(x + xc, y + yc);
-        }
-    glEnd();
-}
-
-void drawElipse(float h, float k, float a, float b, int primative, float y_min=-9999.0f)
-{
-    glBegin(primative);
-    for(int i = 0; i < 200;i++)
-            {
-                float pi = 3.14159265359;
-                float A = (i*2*pi)/200;
-                float scale = sqrt(3.1f);
-                float x = h + a * scale * cos(A); 
-                float y = k + b * scale * sin(A);
-
-                if (y >= y_min)
-                    glVertex2f(x, y);
-            }
-            
-    glEnd();
-}
-
-void drawPoints(const vector<vector<float>>& points, int primative)
-{
-    glBegin(primative);
-        for (int i = 0; i < points.size(); i++) {
-            glVertex2f(points[i][0], points[i][1]);
-        }
-    glEnd();
-}
-
-float* drawParabola(float eqn_xCoeff, float eqn_const, float startX, float endX)
-{
-    float* yCoords = new float[2];
-    float y;
-    glBegin(GL_LINE_STRIP);
-        for (float x = startX; x <= endX; x+=0.01) 
-        {    
-            y = eqn_xCoeff * (x*x) + eqn_const; 
-            glVertex2f(x, y);
-            if (x == startX) {yCoords[0] = y;}
-        }
-    glEnd();
-    yCoords[1] = y;
-    return yCoords;
-}
-
-void drawStar(float x, float y, float outerRadius, float innerRadiusFactor=0.5) {
-    float innerRadius = outerRadius * innerRadiusFactor;
-    glBegin(GL_TRIANGLE_FAN);
-        glVertex2f(x, y);
-        for (int i = 0; i <= 360; i += 30) {
-            float rad = i * PI / 180.0f;
-            float r = (i % 60 == 0) ? outerRadius : innerRadius; 
-            glVertex2f(x + r * cos(rad), y + r * sin(rad));
-        }
-    glEnd();
-}
-
-
-vector<float> getRandomPoint() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-
-    static std::uniform_real_distribution<float> distribX(-190.0f, 190.0f);
-    static std::uniform_real_distribution<float> distribY(50.0f, 100.0f);
-
-    float x = distribX(gen);
-    float y = distribY(gen);
-
-    return {x, y};
-}
+#include "helperFunctions.cpp"
+#include "constants.cpp"
 
 
 class Text {
@@ -125,18 +19,18 @@ class Text {
         int r, g, b;
         float x, y;
         void *font;
-        string text;
+        string str;
     
         Text() {};
 
-        Text(const string& text, float x=0, float y=0, void *font=GLUT_BITMAP_HELVETICA_18,  RGB color=TEXT_COLOR) {
-            this->text = text.c_str();
+        Text(const string& text, float x=0, float y=0, void *font=GLUT_BITMAP_HELVETICA_18,  int r=0, int g=0, int b=0) {
+            this->str = text.c_str();
             this->x = x;
             this->y = y;
             this->font = font;
-            this->r = color.r;
-            this->g = color.g;
-            this->b = color.b;
+            this->r = r;
+            this->g = g;
+            this->b = b;
         }
         
         void draw(float x, float y)
@@ -146,7 +40,7 @@ class Text {
 
             glColor3ub(r, g, b);
             glRasterPos2f(x, y);
-            for (char ch : text) {
+            for (char ch : str) {
                 glutBitmapCharacter(font, ch);
             }
         }
@@ -158,7 +52,7 @@ class Text {
 
             glColor3ub(r, g, b);
             glRasterPos2f(x, y);
-            for (char ch : text) {
+            for (char ch : str) {
                 glutBitmapCharacter(font, ch);
             }
         }
@@ -171,6 +65,7 @@ class Player {
         float x;
         float y;
         float eyesAngle;
+        int dead = false;
 
         Player(float x=PLAYER_X, float y=PLAYER_Y, float eyesAngle=45) {
             this->x = x;
@@ -187,6 +82,8 @@ class Player {
         
             // LEFT LEG
             glColor3ub(96, 57, 19);
+            if (dead)
+                glColor3ub(162, 162, 162);
             drawElipse(-4.35f, -7.0f, 3.0f, 1.4f, GL_POLYGON);
 
             glColor3ub(0,0,0);
@@ -196,7 +93,8 @@ class Player {
             
             // BODY
             glColor3ub(255, 198, 43);
-            // glColor3ub(162, 162, 162);
+            if (dead)
+                glColor3ub(162, 162, 162);
             drawCircle(8, 0, 0, 0, 360, GL_POLYGON);
 
             glColor3ub(0, 0, 0);
@@ -206,6 +104,8 @@ class Player {
 
             // RIGHT LEG
             glColor3ub(96,57,19);
+            if (dead)
+                glColor3ub(162, 162, 162);
             drawElipse(4.35f, -7.0f, 3.0f, 1.4f, GL_POLYGON);
 
             glColor3ub(0,0,0);
@@ -214,6 +114,8 @@ class Player {
 
             glPushMatrix();
             glTranslatef(eyesAngle, 2.5, 0);
+            if (dead)
+                glScalef(1.5, 0.2, 0);
                 // LEFT EYES
                 drawElipse(2.0f, 0.0f, 0.78f, 1.65f, GL_POLYGON);
 
@@ -230,6 +132,27 @@ class Player {
 };
 
 
+class LifeStar {
+    public:
+        float x, y;
+    
+        LifeStar (float x, float y) {
+            this->x = x;
+            this->y = y;
+        }
+
+        void draw() {
+            for (auto &lifeStarPosition : lifeStarPositions) {
+                glPushMatrix();
+                glTranslatef(x, y, 1);
+                glRotatef(90, 0, 0, 1);
+                glColor3ub(255, 0, 0);
+                    drawStar(0, 0, 3, 0.4);
+                glPopMatrix();
+            }
+        }
+};
+
 class Bomb {
     public:
         float radius;
@@ -240,8 +163,10 @@ class Bomb {
         bool exploding = false;
         bool explosionFinished = false;
         float explosionRadius = radius;
-        int explosionDuration = 60;
+        int explosionDuration = 120;
         int explosionFrame = 0;
+
+        Text text;
 
         static void BOMB_DESIGN() {
             // BOMB SPARK
@@ -281,10 +206,7 @@ class Bomb {
             glLineWidth(2);
             drawCircle(5, 0, 0, 0, 360, GL_LINE_LOOP);
         }
-
-
-
-        Text text;
+        
 
         Bomb(float radius, Text text, float x=0, float y=0) {
             this->radius = radius;
@@ -376,7 +298,7 @@ class Bomb {
 
                 if (y <= PLAYER_Y + PLAYER_RADIUS) {
                     explode();
-                    lives--;
+                    livesLeft--;
                 }
             }
         }
@@ -607,33 +529,44 @@ class Background {
 };
 
 
-class Life {
+class Word {
     public:
-        int livesLeft;
-        Text lifeText;
-        vector<vector<float>> lifeStarPosition = {
-            {0, 0}, {6, 0}, {12, 0}
-        };
-    
-        Life (int totalLives=TOTAL_LIVES) {
-            this->livesLeft = 3;
+        string filename;
+        vector<string> words;
+        
+        Word(string filename) {
+            this->filename = filename;
         }
 
-        void decrementLife(int value=1) {
-            livesLeft -= value;
-        }
+    void loadWords() {
+        ifstream file(filename.c_str());
+        string word;
 
-        void draw() {
-            for (int i = 0; i < livesLeft; i++) {
-                glPushMatrix();
-                glTranslatef(lifeStarPosition[i][0], lifeStarPosition[i][1], 1);
-                glRotatef(90, 0, 0, 1);
-                glColor3ub(255, 0, 0);
-                    drawStar(0, 0, 3, 0.4);
-                glPopMatrix();
+        while (file >> word) {
+            words.push_back(word);
+        }
+    }
+
+string getRandomWord(vector<Bomb> &currentBombs) {
+    if (words.empty()) {
+        return "";
+    }
+
+    while (true) { 
+        int index = getRandomInt(0, words.size());
+        string newWord = words[index];
+
+        bool matchFound = false;
+        for (const Bomb &bomb : currentBombs) {
+            if (bomb.text.str[0] == newWord[0]) {
+                matchFound = true;
+                break;
             }
         }
 
-
+        if (!matchFound) {
+            return newWord;
+        }
+    }
+}
 };
-
