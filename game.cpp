@@ -73,8 +73,6 @@ class Player {
             this->eyesAngle = 3.0f * cos(eyesAngle);
         }
 
-        // Player() {}
-
         void draw() {
             glPushMatrix();
             glTranslatef(x, y, 0.0f);
@@ -142,14 +140,12 @@ class LifeStar {
         }
 
         void draw() {
-            for (auto &lifeStarPosition : lifeStarPositions) {
-                glPushMatrix();
-                glTranslatef(x, y, 1);
-                glRotatef(90, 0, 0, 1);
-                glColor3ub(255, 0, 0);
-                    drawStar(0, 0, 3, 0.4);
-                glPopMatrix();
-            }
+            glPushMatrix();
+            glTranslatef(x, y, 1);
+            glRotatef(90, 0, 0, 1);
+            glColor3ub(255, 0, 0);
+                drawStar(0, 0, 3, 0.4);
+            glPopMatrix();
         }
 };
 
@@ -445,6 +441,7 @@ class Bullet {
             if (distance <= targetBomb->radius) {
                 targetBomb->explode();
                 active = false;
+                score++;
                 return;
             }
 

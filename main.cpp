@@ -73,6 +73,10 @@ void sendBombs(int) {
 
 
 void loadLives() {
+    vector<vector<float>> lifeStarPositions = {
+        {160, 95}, {166, 95}, {172, 95}
+    };
+
     for (auto lifeStarPosition : lifeStarPositions) {
         LifeStar newLifeStar(lifeStarPosition[0], lifeStarPosition[1]);
         lifeStars.push_back(newLifeStar);
@@ -97,6 +101,18 @@ void display() {
     // Decrement life
     for (int i = TOTAL_LIVES-1; i >= TOTAL_LIVES-livesLeft; i--) {
         lifeStars[i].draw();
+    }
+
+    Text scoreTxt(to_string(score), -175, 93, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
+    scoreTxt.draw();
+
+    if (player.dead) {
+        Text gameOverTxt("GAME OVER", -15, 5, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
+        gameOverTxt.draw();
+
+        Text finalScoreTxt(to_string(score), 0, -5, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
+        finalScoreTxt.draw();
+
     }
     
     gun.draw();
