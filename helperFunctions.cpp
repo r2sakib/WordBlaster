@@ -10,6 +10,18 @@
 
 using namespace std;
 
+// void playSound(string path) {
+//     ma_result result;
+//     ma_engine engine;
+
+//     ma_engine_uninit(&engine);
+//     result = ma_engine_init(NULL, &engine);
+//     if (result != MA_SUCCESS)
+//         //
+
+//     ma_engine_play_sound(&engine, path.c_str(), NULL);
+// }
+
 
 vector<float> getRandomPoint() {
     static std::random_device rd;

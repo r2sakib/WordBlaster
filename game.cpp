@@ -7,11 +7,11 @@
 #include <iostream>
 #include <random>
 #include <fstream>
+#include "miniaudio.h"
 
 using namespace std;
 
 #include "helperFunctions.cpp"
-#include "constants.cpp"
 
 
 class Text {
@@ -149,6 +149,7 @@ class LifeStar {
         }
 };
 
+
 class Bomb {
     public:
         float radius;
@@ -161,6 +162,8 @@ class Bomb {
         float explosionRadius = radius;
         int explosionDuration = 120;
         int explosionFrame = 0;
+
+        bool explosionSoundPlayed = false;
 
         Text text;
 
@@ -228,7 +231,9 @@ class Bomb {
 
         void draw()
         {
-            if (explosionFinished) return;
+            if (explosionFinished) {
+                return;
+            }
 
             // BOBM EXPLOSION
             if (exploding) {
@@ -253,8 +258,6 @@ class Bomb {
                     }
 
                     drawStar(x, y, outerRadius);
-
-
                 glDisable(GL_BLEND);
             }
             else {
@@ -273,7 +276,8 @@ class Bomb {
             }
         }
 
-        void animate() {
+        
+        void animate(ma_engine* g_audioEngine) {
             if (exploding) {
                 explosionFrame++;
                 if (explosionFrame >= explosionDuration) {
@@ -292,7 +296,12 @@ class Bomb {
                     y += (dirY / distance) * BOMB_SPEED;
                 }
 
+                
                 if (y <= PLAYER_Y + PLAYER_RADIUS) {
+                    if(!explosionSoundPlayed){
+                        ma_engine_play_sound(g_audioEngine, SOUND_EXPLOSION, NULL);
+                        explosionSoundPlayed = true;
+                    }
                     explode();
                     livesLeft--;
                 }
@@ -386,7 +395,7 @@ class Bullet {
         Bomb* targetBomb;
         Gun* gun;
 
-        Bullet(Bomb* targetBomb, Player* player, Gun* gun, float x=GUN_X, float y=GUN_Y) {
+        Bullet(Bomb* targetBomb, Player* player, Gun* gun, ma_engine* g_audioEngine, float x=GUN_X, float y=GUN_Y) {
             this->x = x;
             this->y = y;
 
@@ -395,8 +404,12 @@ class Bullet {
 
             this->targetBomb = targetBomb;
             this->player = player;
+            // Move the eyes and gun
             player->animate(angleOfAttack_rad);
             this->x = gun->animate(angleOfAttack_deg);
+
+            ma_engine_play_sound(g_audioEngine, "sounds/firing.wav", NULL);
+
         }
 
         Bullet() {};
@@ -511,16 +524,7 @@ class Background {
         drawRect(0.4f, 0.5f, 0.7f, 0.6f, 1.0f, 1.0f, 1.0f);
         drawRect(0.5f, 0.6f, 0.8f, 0.7f, 1.0f, 1.0f, 1.0f);
         drawRect(0.55f, 0.55f, 0.7f, 0.65f, 0.9f, 0.9f, 0.9f);
-
-        // // Tree 1
-        // drawRect(-0.2f, -0.5f, -0.15f, 0.0f, 0.55f, 0.27f, 0.07f); 
-        // // drawTriangle(-0.28f, -0.3f, -0.07f, -0.3f, -0.175f, -0.15f, 0.0f, 0.6f, 0.2f); 
-        // drawTriangle(-0.26f, -0.0f, -0.2f, -0.0f, -0.175f, -0.05f, 0.0f, 0.5f, 0.2f); 
-
-        // // Tree 2
-        // drawRect(0.5f, -0.5f, 0.55f, -0.3f, 0.55f, 0.27f, 0.07f);
-        // drawTriangle(0.42f, -0.3f, 0.63f, -0.3f, 0.525f, -0.15f, 0.0f, 0.6f, 0.2f);
-        // drawTriangle(0.44f, -0.2f, 0.61f, -0.2f, 0.525f, -0.05f, 0.0f, 0.5f, 0.2f); 
+ 
         glPopMatrix();
     }
 };
@@ -568,9 +572,17 @@ class Word {
     }
 };
 
+
 class GameOver {
     public:
-        void draw() {
+        bool gameOverSoundPlayed = false;
+
+        void draw(ma_engine *g_audioEngine) {
+            if(!gameOverSoundPlayed){
+                ma_engine_play_sound(g_audioEngine, SOUND_GAME_OVER, NULL);
+                gameOverSoundPlayed = true;
+            }
+
             // To fade the gameplay (opacity lowered)
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

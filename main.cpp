@@ -7,6 +7,7 @@
 
 #include "game.cpp"
 
+#define MINIAUDIO_IMPLEMENTATION
 using namespace std;
 
 
@@ -16,6 +17,7 @@ void animate(int);
 void keyboard(unsigned char key, int x, int y);
 void sendBombs(int);
 void loadLives();
+void cleanup();
 
 
 Background background = Background();
@@ -30,6 +32,9 @@ vector<Bullet> bullets;
 vector<LifeStar> lifeStars;
 
 string currentTypedStr;
+
+ma_engine g_audioEngine;
+ma_sound g_backgroundSound;
 
 
 int main(int argc, char** argv) {
@@ -49,10 +54,22 @@ int main(int argc, char** argv) {
     glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
 
 
+    ma_result result = ma_engine_init(NULL, &g_audioEngine);
+    if (result != MA_SUCCESS) {
+        std::cerr << "Failed to initialize audio engine." << std::endl;
+        return -1;
+    }
+
+    ma_sound_init_from_file(&g_audioEngine, SOUND_BACKGROUND, 0, NULL, NULL, &g_backgroundSound);
+    ma_sound_start(&g_backgroundSound);
+    ma_sound_set_looping(&g_backgroundSound, MA_TRUE);
+    atexit(cleanup);
+    
+
     word.loadWords();
     loadLives();
     sendBombs(0);
-
+    
     glutMainLoop();
 
     return 0;
@@ -103,6 +120,7 @@ void display() {
     for (int i = TOTAL_LIVES-1; i >= TOTAL_LIVES-livesLeft; i--) {
         lifeStars[i].draw();
     }
+
     
     
     gun.draw();
@@ -113,9 +131,9 @@ void display() {
     scoreTxt.draw();
 
     if (player.dead) {
-        gameOver.draw();
+        ma_sound_stop(&g_backgroundSound);
+        gameOver.draw(&g_audioEngine);
     }
-
 
     glutSwapBuffers();
 }
@@ -132,7 +150,7 @@ void animate(int)
 
     if (livesLeft > 0) {
         for (int i = 0; i < bombs.size(); i++) {
-            bombs[i].animate();
+            bombs[i].animate(&g_audioEngine);
             if (bombs[i].isDone()) {
                 bombs.erase(bombs.begin() + i);
                 i--;
@@ -147,6 +165,7 @@ void animate(int)
             }
         }
     }
+
 }
 
 
@@ -167,7 +186,7 @@ void keyboard(unsigned char key, int x, int y) {
     for (Bomb &bomb : bombs) {
         if (bomb.text.str == currentTypedStr) {
             currentTypedStr = "";
-            Bullet newBullet(&bomb, &player, &gun);
+            Bullet newBullet(&bomb, &player, &gun, &g_audioEngine);
             bullets.push_back(newBullet);
         }
     }
@@ -188,4 +207,8 @@ void reshape(int w, int h) {
     }
 
     glMatrixMode(GL_MODELVIEW);
+}
+
+void cleanup() {
+    ma_engine_uninit(&g_audioEngine);
 }
