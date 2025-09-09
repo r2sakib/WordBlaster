@@ -142,9 +142,8 @@ class LifeStar {
         void draw() {
             glPushMatrix();
             glTranslatef(x, y, 1);
-            glRotatef(90, 0, 0, 1);
             glColor3ub(255, 0, 0);
-                drawStar(0, 0, 3, 0.4);
+                drawHeart(0, 0, 0.15);
             glPopMatrix();
         }
 };
@@ -575,7 +574,13 @@ class Word {
 
 class GameOver {
     public:
+    int HIGH_SCORE = 35;
         bool gameOverSoundPlayed = false;
+
+        PixelArtRenderer gameOverTxt = PixelArtRenderer(2);
+        PixelArtRenderer scoreTxt = PixelArtRenderer(1);
+        PixelArtRenderer highScoreTxt = PixelArtRenderer(0.7);
+
 
         void draw(ma_engine *g_audioEngine) {
             if(!gameOverSoundPlayed){
@@ -594,10 +599,10 @@ class GameOver {
                 glVertex2f(-190, 100);
             glEnd();
 
-            Text gameOverTxt("GAME OVER", -15, 5, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
-            gameOverTxt.draw();
+            gameOverTxt.setColor(255, 133, 0);
+            gameOverTxt.drawCentered("GAME OVER", 0, 20, 190);
 
-            Text finalScoreTxt(to_string(score), 0, -5, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
-            finalScoreTxt.draw();
+            scoreTxt.drawCentered(to_string(score), 0, 0, 190);
+            highScoreTxt.drawCentered("HI " + to_string(HIGH_SCORE), 0, -15, 190);
         }
 };

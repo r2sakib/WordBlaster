@@ -93,7 +93,7 @@ void sendBombs(int) {
 
 void loadLives() {
     vector<vector<float>> lifeStarPositions = {
-        {160, 95}, {166, 95}, {172, 95}
+        {157, 94}, {164, 94}, {171, 94}
     };
 
     for (auto lifeStarPosition : lifeStarPositions) {
@@ -127,9 +127,10 @@ void display() {
     gun.draw();
     player.draw();
 
-    // Draw Score
-    Text scoreTxt(to_string(score), -175, 93, GLUT_BITMAP_TIMES_ROMAN_24, 255, 0, 0);
-    scoreTxt.draw();
+    PixelArtRenderer liveScoreTxt = PixelArtRenderer(0.7);
+    liveScoreTxt.setColor(255, 0, 0);
+    liveScoreTxt.draw(to_string(score), -173, 95);
+
 
     if (player.dead) {
         ma_sound_stop(&g_backgroundSound);
