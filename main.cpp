@@ -4,10 +4,11 @@
 #include <string>
 #include <vector>
 #include <random>
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio.h"
 
 #include "game.cpp"
 
-#define MINIAUDIO_IMPLEMENTATION
 using namespace std;
 
 
