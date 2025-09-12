@@ -85,11 +85,11 @@ class Player {
 };
 
 
-class LifeStar {
+class LifeHeart {
     public:
         float x, y;
     
-        LifeStar (float x, float y) {
+        LifeHeart (float x, float y) {
             this->x = x;
             this->y = y;
         }
@@ -486,14 +486,15 @@ class Background {
 
 class Word {
     public:
-        string filename;
-        vector<string> words;
-        
-        Word(string filename) {
-            this->filename = filename;
-        }
+    string filename;
+    vector<string> words = EMBEDDED_WORDS;
+    
+    Word(string filename) {
+        this->filename = filename;
+    }
 
     void loadWords() {
+        words.clear();
         ifstream file(filename.c_str());
         string word;
 

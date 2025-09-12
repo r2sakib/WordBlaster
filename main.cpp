@@ -31,7 +31,7 @@ HomePage homepage = HomePage();
 
 vector<Bomb> bombs;
 vector<Bullet> bullets;
-vector<LifeStar> lifeStars;
+vector<LifeHeart> lifeHearts;
 
 string currentTypedStr;
 
@@ -45,7 +45,12 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
 
-    glutInitWindowSize(500, 500);
+    // FULL SCREEN ON ALL DEVICES
+    int screenWidth = glutGet(GLUT_SCREEN_WIDTH);
+    int screenHeight = glutGet(GLUT_SCREEN_HEIGHT);
+
+    glutInitWindowSize(screenWidth, screenHeight);
+    glutInitWindowPosition(0, 0); 
     glutCreateWindow("Word Blaster");
     glutFullScreen();
 
@@ -53,14 +58,16 @@ int main(int argc, char** argv) {
     glutReshapeFunc(reshape);
     glutTimerFunc(0, animate, 0);
     glutKeyboardFunc(keyboard);
-    animate(0);
 
+    // GAME INITIALIZATION
     glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
+    loadLives();
+    sendBombs(0);
 
-
+    // Audio init
     ma_result result = ma_engine_init(NULL, &g_audioEngine);
     if (result != MA_SUCCESS) {
-        std::cerr << "Failed to initialize audio engine." << std::endl;
+        cout << "Failed to initialize audio engine." << endl;
         return -1;
     }
 
@@ -68,11 +75,6 @@ int main(int argc, char** argv) {
     ma_sound_start(&g_backgroundSound);
     ma_sound_set_looping(&g_backgroundSound, MA_TRUE);
     atexit(cleanup);
-    
-
-    word.loadWords();
-    loadLives();
-    sendBombs(0);
     
     glutMainLoop();
 
@@ -87,6 +89,7 @@ void sendBombs(int) {
     for (int i = 0; i < 5; i++) {
         vector<float> point = getRandomPoint();
         Text newWord(word.getRandomWord(bombs), 0, 0);
+        
         Bomb newBomb(2, newWord, point[0], point[1]);
         bombs.push_back(newBomb);
     }
@@ -101,8 +104,8 @@ void loadLives() {
     };
 
     for (auto lifeStarPosition : lifeStarPositions) {
-        LifeStar newLifeStar(lifeStarPosition[0], lifeStarPosition[1]);
-        lifeStars.push_back(newLifeStar);
+        LifeHeart newLifeHeart(lifeStarPosition[0], lifeStarPosition[1]);
+        lifeHearts.push_back(newLifeHeart);
     }
 }
 
@@ -131,7 +134,7 @@ void display() {
 
     // Decrement life
     for (int i = TOTAL_LIVES-1; i >= TOTAL_LIVES-livesLeft; i--) {
-        lifeStars[i].draw();
+        lifeHearts[i].draw();
     }
 
     
