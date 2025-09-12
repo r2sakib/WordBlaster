@@ -2,6 +2,9 @@
 
 Word Blaster is a fast-paced typing game where your goal is to shoot down falling bombs by typing the words attached to them. As you progress, the waves of bombs become more frequent and numerous, testing your typing speed and accuracy.
 
+<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/8a6b273e-0a99-44a1-b17f-aa7082d899db" />
+
+
 ## Features
 
 *   **Endless Gameplay:** Face continuous waves of bombs with progressively increasing difficulty.
@@ -36,7 +39,7 @@ The `miniaudio` library is included directly in the source (`miniaudio.h`), so n
 Navigate to the project directory in your terminal and run the following command to compile the game:
 
 ```sh
-g++ main.cpp -o WordBlaster.exe -lfreeglut -lglu32 -lopengl32 -lwinmm
+g++ main.cpp -o WordBlaster.exe -lfreeglut -lglu32 -lopengl32
 ```
 
 This will create an executable file named `WordBlaster.exe`.
