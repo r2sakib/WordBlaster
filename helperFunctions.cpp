@@ -943,3 +943,48 @@ public:
         draw(text, startX, y);
     }
 };
+
+
+class HighScore {
+    public:
+
+    string getSaveFilePath() {
+        // Get the path to the user's AppData folder
+        const char* appdataPath = getenv("APPDATA");
+        if (appdataPath == nullptr) {
+            return "highscore.wbs";
+        }
+
+        // Create a specific folder for our game inside AppData
+        string gameDataFolder = string(appdataPath) + "\\WordBlaster";
+        _mkdir(gameDataFolder.c_str());
+
+        return gameDataFolder + "\\highscore.wbs";
+    }
+
+
+    void saveHighScore(int score) {
+        string filePath = getSaveFilePath();
+        ofstream scoreFile(filePath);
+
+        if (scoreFile.is_open()) {
+            scoreFile << score;
+            scoreFile.close();
+        } else {
+            cout << "Error: Could not save high score to " << filePath << endl;
+        }
+    }
+
+    int loadHighScore() {
+        string filePath = getSaveFilePath();
+        ifstream scoreFile(filePath);
+        int highScore = 0; // default high score
+
+        if (scoreFile.is_open()) {
+            scoreFile >> highScore;
+            scoreFile.close();
+        }
+        
+        return highScore;
+    }
+};

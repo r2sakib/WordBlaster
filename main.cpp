@@ -61,6 +61,7 @@ int main(int argc, char** argv) {
 
     // GAME INITIALIZATION
     glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
+    animate(0);
     loadLives();
     sendBombs(0);
 
@@ -223,6 +224,7 @@ void keyboard(unsigned char key, int x, int y) {
         currentTypedStr = "";
 }
 
+
 void reshape(int w, int h) {
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
@@ -237,6 +239,7 @@ void reshape(int w, int h) {
 
     glMatrixMode(GL_MODELVIEW);
 }
+
 
 void cleanup() {
     ma_engine_uninit(&g_audioEngine);

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <random>
 #include <fstream>
+#include <direct.h>
 #include "miniaudio.h"
 
 using namespace std;
@@ -530,38 +531,51 @@ class Word {
 
 class GameOver {
     public:
-    int HIGH_SCORE = 35;
-        bool gameOverSoundPlayed = false;
+    int HIGH_SCORE = 0;
+    HighScore highScore = HighScore();
 
-        PixelArtText gameOverTxt = PixelArtText(2);
-        PixelArtText scoreTxt = PixelArtText(1);
-        PixelArtText highScoreTxt = PixelArtText(0.7);
+    bool gameOverSoundPlayed = false;
+
+    PixelArtText gameOverTxt = PixelArtText(2);
+    PixelArtText scoreTxt = PixelArtText(1);
+    PixelArtText highScoreTxt = PixelArtText(0.7);
 
 
-        void draw(ma_engine *g_audioEngine) {
-            if(!gameOverSoundPlayed){
-                ma_engine_play_sound(g_audioEngine, SOUND_GAME_OVER, NULL);
-                gameOverSoundPlayed = true;
-            }
+    void draw(ma_engine *g_audioEngine) {
+        if(!gameOverSoundPlayed){
+            ma_engine_play_sound(g_audioEngine, SOUND_GAME_OVER, NULL);
+            gameOverSoundPlayed = true;
+        }
 
-            // To fade the gameplay (opacity lowered)
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glColor4f(0.0f, 0.0f, 0.0f, 0.30f);
-            glBegin(GL_QUADS);
-                glVertex2f(190, 100);
-                glVertex2f(190, -100);
-                glVertex2f(-190, -100);
-                glVertex2f(-190, 100);
-            glEnd();
+        // To fade the gameplay (opacity lowered)
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.30f);
+        glBegin(GL_QUADS);
+            glVertex2f(190, 100);
+            glVertex2f(190, -100);
+            glVertex2f(-190, -100);
+            glVertex2f(-190, 100);
+        glEnd();
 
-            gameOverTxt.setColor(214, 40, 40);
-            gameOverTxt.drawCentered("GAME OVER", 0, 30, 190);
+        gameOverTxt.setColor(214, 40, 40);
+        gameOverTxt.drawCentered("GAME OVER", 0, 30, 190);
 
-            scoreTxt.drawCentered(to_string(score), 0, 0, 190);
+        scoreTxt.drawCentered(to_string(score), 0, 0, 190);
 
+        // Check if new high score made
+        HIGH_SCORE = highScore.loadHighScore();
+
+        if (score >= HIGH_SCORE) {
+            highScore.saveHighScore(score);
+
+            highScoreTxt.setColor(214, 40, 40);
+            highScoreTxt.drawCentered("NEW HI " + to_string(HIGH_SCORE), 0, -15, 190);
+        }
+        else {
             highScoreTxt.drawCentered("HI " + to_string(HIGH_SCORE), 0, -15, 190);
         }
+    }
 };
 
 
@@ -572,8 +586,8 @@ class HomePage {
     Background background = Background();
 
     PixelArtText titleTxt = PixelArtText(2);
-    PixelArtText startGameTxt = PixelArtText(1);
-    PixelArtText exitGameTxt = PixelArtText(1);
+    PixelArtText startGameTxt = PixelArtText(0.75);
+    PixelArtText exitGameTxt = PixelArtText(0.75);
     
 
     void draw() {
@@ -586,7 +600,7 @@ class HomePage {
         startGameTxt.drawCentered("Press ENTER to play", 0, 0, 190);
 
         exitGameTxt.setColor(0, 48, 73);
-        exitGameTxt.drawCentered("Press ESC to exit", 0, -20, 190);
+        exitGameTxt.drawCentered("Press ESC to exit", 0, -10, 190);
     }
 
 };
