@@ -14,51 +14,6 @@ using namespace std;
 #include "helperFunctions.cpp"
 
 
-class Text {
-    public:
-        int r, g, b;
-        float x, y;
-        void *font;
-        string str;
-    
-        Text() {};
-
-        Text(const string& text, float x=0, float y=0, void *font=GLUT_BITMAP_HELVETICA_18,  int r=0, int g=0, int b=0) {
-            this->str = text.c_str();
-            this->x = x;
-            this->y = y;
-            this->font = font;
-            this->r = r;
-            this->g = g;
-            this->b = b;
-        }
-        
-        void draw(float x, float y)
-        {
-            this->x = x;
-            this->y = y;
-
-            glColor3ub(r, g, b);
-            glRasterPos2f(x, y);
-            for (char ch : str) {
-                glutBitmapCharacter(font, ch);
-            }
-        }
-
-        void draw()
-        {
-            this->x = x;
-            this->y = y;
-
-            glColor3ub(r, g, b);
-            glRasterPos2f(x, y);
-            for (char ch : str) {
-                glutBitmapCharacter(font, ch);
-            }
-        }
-
-};
-
 
 class Player {
     public:
@@ -467,9 +422,9 @@ class Bullet {
 
 
 class Background {
-        public:
+    public:
 
-        Background() {}
+    Background() {}
 
     void drawRect(float x1, float y1, float x2, float y2, float r, float g, float b) {
         glColor3f(r, g, b);
@@ -577,9 +532,9 @@ class GameOver {
     int HIGH_SCORE = 35;
         bool gameOverSoundPlayed = false;
 
-        PixelArtRenderer gameOverTxt = PixelArtRenderer(2);
-        PixelArtRenderer scoreTxt = PixelArtRenderer(1);
-        PixelArtRenderer highScoreTxt = PixelArtRenderer(0.7);
+        PixelArtText gameOverTxt = PixelArtText(2);
+        PixelArtText scoreTxt = PixelArtText(1);
+        PixelArtText highScoreTxt = PixelArtText(0.7);
 
 
         void draw(ma_engine *g_audioEngine) {
@@ -599,10 +554,38 @@ class GameOver {
                 glVertex2f(-190, 100);
             glEnd();
 
-            gameOverTxt.setColor(255, 133, 0);
-            gameOverTxt.drawCentered("GAME OVER", 0, 20, 190);
+            gameOverTxt.setColor(214, 40, 40);
+            gameOverTxt.drawCentered("GAME OVER", 0, 30, 190);
 
             scoreTxt.drawCentered(to_string(score), 0, 0, 190);
+
             highScoreTxt.drawCentered("HI " + to_string(HIGH_SCORE), 0, -15, 190);
         }
+};
+
+
+class HomePage {
+    public: 
+    HomePage () {}
+
+    Background background = Background();
+
+    PixelArtText titleTxt = PixelArtText(2);
+    PixelArtText startGameTxt = PixelArtText(1);
+    PixelArtText exitGameTxt = PixelArtText(1);
+    
+
+    void draw() {
+        background.draw();
+        
+        titleTxt.setColor(244, 90, 0);
+        titleTxt.drawCentered("WORD BLASTER", 0, 30, 190);
+
+        startGameTxt.setColor(0, 48, 73);
+        startGameTxt.drawCentered("Press ENTER to play", 0, 0, 190);
+
+        exitGameTxt.setColor(0, 48, 73);
+        exitGameTxt.drawCentered("Press ESC to exit", 0, -20, 190);
+    }
+
 };

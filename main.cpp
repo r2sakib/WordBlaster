@@ -26,6 +26,7 @@ Player player = Player();
 Gun gun = Gun();
 Word word = Word(WORDS_FILE_PATH);
 GameOver gameOver = GameOver();
+HomePage homepage = HomePage();
 
 
 vector<Bomb> bombs;
@@ -36,6 +37,8 @@ string currentTypedStr;
 
 ma_engine g_audioEngine;
 ma_sound g_backgroundSound;
+
+bool gameStarted = false;
 
 
 int main(int argc, char** argv) {
@@ -76,6 +79,7 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+
 void sendBombs(int) {
     if (livesLeft == 0)
         return;
@@ -107,6 +111,14 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
+    if (!gameStarted) {
+        homepage.draw();
+        glutSwapBuffers();
+
+        return;
+    }
+
+
     background.draw();
     
     for (int i = 0; i < bombs.size(); i++) {
@@ -127,7 +139,7 @@ void display() {
     gun.draw();
     player.draw();
 
-    PixelArtRenderer liveScoreTxt = PixelArtRenderer(0.7);
+    PixelArtText liveScoreTxt = PixelArtText(0.7);
     liveScoreTxt.setColor(255, 0, 0);
     liveScoreTxt.draw(to_string(score), -173, 95);
 
@@ -145,6 +157,12 @@ void animate(int)
 {
     glutPostRedisplay();
     glutTimerFunc(1000/60, animate, 0);
+
+    if (!gameStarted) {
+        homepage.draw();
+        return;
+    }
+
 
     if (livesLeft == 0) {
         player.dead = true;
@@ -172,9 +190,15 @@ void animate(int)
 
 
 void keyboard(unsigned char key, int x, int y) {
-    // Exit full screen
+    // Exit game
     if (key == 27){
         exit(0);
+        return;
+    }
+
+    // Start game
+    if (key == 13) {
+        gameStarted = true;
         return;
     }
 

@@ -11,18 +11,6 @@
 
 using namespace std;
 
-// void playSound(string path) {
-//     ma_result result;
-//     ma_engine engine;
-
-//     ma_engine_uninit(&engine);
-//     result = ma_engine_init(NULL, &engine);
-//     if (result != MA_SUCCESS)
-//         //
-
-//     ma_engine_play_sound(&engine, path.c_str(), NULL);
-// }
-
 
 vector<float> getRandomPoint() {
     static std::random_device rd;
@@ -61,6 +49,7 @@ void drawCircle(float radius, float xc, float yc, float startAngle, float endAng
     glEnd();
 }
 
+
 void drawElipse(float h, float k, float a, float b, int primative, float y_min=-9999.0f)
 {
     glBegin(primative);
@@ -79,6 +68,7 @@ void drawElipse(float h, float k, float a, float b, int primative, float y_min=-
     glEnd();
 }
 
+
 void drawPoints(const vector<vector<float>>& points, int primative)
 {
     glBegin(primative);
@@ -87,6 +77,7 @@ void drawPoints(const vector<vector<float>>& points, int primative)
         }
     glEnd();
 }
+
 
 float* drawParabola(float eqn_xCoeff, float eqn_const, float startX, float endX)
 {
@@ -104,6 +95,7 @@ float* drawParabola(float eqn_xCoeff, float eqn_const, float startX, float endX)
     return yCoords;
 }
 
+
 void drawStar(float x, float y, float outerRadius, float innerRadiusFactor=0.5) {
     float innerRadius = outerRadius * innerRadiusFactor;
     glBegin(GL_TRIANGLE_FAN);
@@ -115,6 +107,7 @@ void drawStar(float x, float y, float outerRadius, float innerRadiusFactor=0.5) 
         }
     glEnd();
 }
+
 
 void drawHeart(float centerX, float centerY, float scale) {
     glBegin(GL_POLYGON);
@@ -134,7 +127,53 @@ void drawHeart(float centerX, float centerY, float scale) {
 
 
 
-class PixelArtRenderer {
+class Text {
+    public:
+        int r, g, b;
+        float x, y;
+        void *font;
+        string str;
+    
+        Text() {};
+
+        Text(const string& text, float x=0, float y=0, void *font=GLUT_BITMAP_HELVETICA_18,  int r=0, int g=0, int b=0) {
+            this->str = text.c_str();
+            this->x = x;
+            this->y = y;
+            this->font = font;
+            this->r = r;
+            this->g = g;
+            this->b = b;
+        }
+        
+        void draw(float x, float y)
+        {
+            this->x = x;
+            this->y = y;
+
+            glColor3ub(r, g, b);
+            glRasterPos2f(x, y);
+            for (char ch : str) {
+                glutBitmapCharacter(font, ch);
+            }
+        }
+
+        void draw()
+        {
+            this->x = x;
+            this->y = y;
+
+            glColor3ub(r, g, b);
+            glRasterPos2f(x, y);
+            for (char ch : str) {
+                glutBitmapCharacter(font, ch);
+            }
+        }
+
+};
+
+
+class PixelArtText {
 private:
     static const int CHAR_WIDTH = 5;
     static const int CHAR_HEIGHT = 7;
@@ -834,7 +873,7 @@ private:
     }
     
 public:
-    PixelArtRenderer(float size = 10.0f) : pixelSize(size), r(255), g(255), b(255) {
+    PixelArtText(float size = 10.0f) : pixelSize(size), r(255), g(255), b(255) {
         initializeCharacterPatterns();
     }
     
