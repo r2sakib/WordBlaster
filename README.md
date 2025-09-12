@@ -2,6 +2,9 @@
 
 Word Blaster is a fast-paced typing game where your goal is to shoot down falling bombs by typing the words attached to them. As you progress, the waves of bombs become more frequent and numerous, testing your typing speed and accuracy.
 
+<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/8a6b273e-0a99-44a1-b17f-aa7082d899db" />
+
+
 ## Features
 
 *   **Endless Gameplay:** Face continuous waves of bombs with progressively increasing difficulty.
