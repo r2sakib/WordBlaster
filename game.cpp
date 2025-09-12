@@ -9,7 +9,7 @@
 #include <random>
 #include <fstream>
 #include <direct.h>
-#include "res/miniaudio.h"
+#include "miniaudio.h"
 
 using namespace std;
 
@@ -487,7 +487,7 @@ class Background {
 class Word {
     public:
     string filename;
-    vector<string> words = EMBEDDED_WORDS;
+    vector<string> words;
     
     Word(string filename) {
         this->filename = filename;
@@ -509,12 +509,12 @@ class Word {
         }
 
         while (true) { 
-            int index = getRandomInt(0, words.size());
+            int index = getRandomInt(0, words.size() - 1);
             string newWord = words[index];
 
             bool matchFound = false;
             for (const Bomb &bomb : currentBombs) {
-                if (bomb.text.str[0] == newWord[0]) {
+                if (!bomb.text.str.empty() && bomb.text.str[0] == newWord[0]) {
                     matchFound = true;
                     break;
                 }
@@ -603,8 +603,7 @@ class HomePage {
         startGameTxt.drawCentered("Press ENTER to play", 0, 0, 190);
 
         exitGameTxt.setColor(0, 48, 73);
-        exitGameTxt.drawCentered("Press ESC to exit", 0, -10, 190);
+        exitGameTxt.drawCentered("Press ESC to exit", 0, -15, 190);
     }
 
 };
-

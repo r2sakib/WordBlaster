@@ -20,7 +20,7 @@ vector<float> getRandomPoint() {
     static std::mt19937 gen(rd());
 
     static std::uniform_real_distribution<float> distribX(-185.0f, 185.0f);
-    static std::uniform_real_distribution<float> distribY(100.0f, 200.0f);
+    static std::uniform_real_distribution<float> distribY(100.0f, 300.0f);
 
     float x = distribX(gen);
     float y = distribY(gen);
@@ -31,9 +31,9 @@ vector<float> getRandomPoint() {
 int getRandomInt(int rangeStart, int rangeEnd) {
     static std::random_device rd;
     static std::mt19937 gen(rd());
-
-    static std::uniform_int_distribution<int> distrib(rangeStart, rangeEnd);
-
+    
+    std::uniform_int_distribution<int> distrib(rangeStart, rangeEnd);
+    
     return distrib(gen);
 }
 
@@ -990,4 +990,3 @@ class HighScore {
         return highScore;
     }
 };
-

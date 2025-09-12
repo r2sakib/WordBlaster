@@ -6,7 +6,7 @@
 #include <vector>
 #include <random>
 #define MINIAUDIO_IMPLEMENTATION
-#include "res/miniaudio.h"
+#include "miniaudio.h"
 
 #include "game.cpp"
 
@@ -40,7 +40,7 @@ string currentTypedStr;
 ma_engine g_audioEngine;
 ma_sound g_backgroundSound;
 
-// bool gameStarted = false;
+
 GameState currentState = START_SCREEN;
 
 
@@ -66,6 +66,7 @@ int main(int argc, char** argv) {
     // GAME INITIALIZATION
     glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
     animate(0);
+    word.loadWords();
     loadLives();
     sendBombs(0);
 
@@ -91,13 +92,17 @@ void sendBombs(int) {
     if (livesLeft == 0)
         return;
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < NUM_OF_BOMBS_PER_WAVE; i++) {
         vector<float> point = getRandomPoint();
         Text newWord(word.getRandomWord(bombs), 0, 0);
         
         Bomb newBomb(2, newWord, point[0], point[1]);
         bombs.push_back(newBomb);
     }
+
+    if (NUM_OF_BOMBS_PER_WAVE < 10)
+        NUM_OF_BOMBS_PER_WAVE++;
+
 
     glutTimerFunc(BOMB_WAVE_TIME_SEC*1000, sendBombs, 0);
 }
@@ -137,10 +142,11 @@ void display() {
     }
 
     // Decrement life
+    if (livesLeft <= 3) {
     for (int i = TOTAL_LIVES-1; i >= TOTAL_LIVES-livesLeft; i--) {
         lifeHearts[i].draw();
     }
-
+    }
     
     
     gun.draw();
@@ -229,10 +235,17 @@ void keyboard(unsigned char key, int x, int y) {
         if (bomb.text.str == currentTypedStr) {
             bullets.push_back(Bullet(&bomb, &player, &gun, &g_audioEngine));
             currentTypedStr = "";
+            break;
         }
     }
     if (currentTypedStr.length() > 5)
         currentTypedStr = "";
+    
+    if (currentTypedStr == "infin") {
+        livesLeft = 10000;
+        currentTypedStr = "";
+    }
+
 }
 
 
@@ -268,6 +281,9 @@ void resetGame() {
     
     sendBombs(0);
     loadLives();
+
+    ma_sound_start(&g_backgroundSound);
+    ma_sound_set_looping(&g_backgroundSound, MA_TRUE);
     
     currentState = PLAYING;
 }
