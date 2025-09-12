@@ -39,7 +39,7 @@ The `miniaudio` library is included directly in the source (`miniaudio.h`), so n
 Navigate to the project directory in your terminal and run the following command to compile the game:
 
 ```sh
-g++ main.cpp -o WordBlaster.exe -lfreeglut -lglu32 -lopengl32 -lwinmm
+g++ main.cpp -o WordBlaster.exe -lfreeglut -lglu32 -lopengl32
 ```
 
 This will create an executable file named `WordBlaster.exe`.
