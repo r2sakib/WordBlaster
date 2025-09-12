@@ -6,6 +6,9 @@
 #include <vector>
 #include <random>
 #include <map>
+#include <fstream>
+#include <direct.h>
+#include <iostream>
 
 #include "constants.cpp"
 
@@ -101,7 +104,7 @@ void drawStar(float x, float y, float outerRadius, float innerRadiusFactor=0.5) 
     glBegin(GL_TRIANGLE_FAN);
         glVertex2f(x, y);
         for (int i = 0; i <= 360; i += 30) {
-            float rad = i * PI / 180.0f;
+            float rad = i * 3.14159265359 / 180.0f;
             float r = (i % 60 == 0) ? outerRadius : innerRadius; 
             glVertex2f(x + r * cos(rad), y + r * sin(rad));
         }
@@ -124,7 +127,6 @@ void drawHeart(float centerX, float centerY, float scale) {
 
     glEnd();
 }
-
 
 
 class Text {
@@ -988,3 +990,4 @@ class HighScore {
         return highScore;
     }
 };
+

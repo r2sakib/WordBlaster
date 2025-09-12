@@ -4,16 +4,16 @@
 #include <math.h>
 #include <string>
 #include <vector>
+#include <list>
 #include <iostream>
 #include <random>
 #include <fstream>
 #include <direct.h>
-#include "miniaudio.h"
+#include "res/miniaudio.h"
 
 using namespace std;
 
 #include "helperFunctions.cpp"
-
 
 
 class Player {
@@ -254,7 +254,7 @@ class Bomb {
                 
                 if (y <= PLAYER_Y + PLAYER_RADIUS) {
                     if(!explosionSoundPlayed){
-                        ma_engine_play_sound(g_audioEngine, SOUND_EXPLOSION, NULL);
+                        ma_engine_play_sound(g_audioEngine, SOUND_LIFE_LOSE, NULL);
                         explosionSoundPlayed = true;
                     }
                     explode();
@@ -276,7 +276,6 @@ class Gun {
         this->angleOfAttack = angleOfAttack;
     }
 
-    // Gun () {};
 
     void draw() {
         glPushMatrix();
@@ -316,7 +315,7 @@ class Gun {
         drawPoints(GUN_BARREL_POINTS, GL_POLYGON);
 
         // GUN OUTLINE
-        std::vector<std::vector<float>> GUN_OUTLINE_POINTS = {
+        vector<vector<float>> GUN_OUTLINE_POINTS = {
             {-15.06f, 0.2f},  {-15.12f, -5.13f}, {-8.73f, -2.18f}, {-6.87f, -2.78f},
             {-3.56f, -0.01f}, {7.5f, 0.0f},      {8.62f, 1.4f},   {15.92f, 1.4f},
             {15.92f, 2.62f},  {-3.45f, 2.7f},     {-7.1f, 0.2f},   {-8.83f, 0.88f}
@@ -363,7 +362,7 @@ class Bullet {
             player->animate(angleOfAttack_rad);
             this->x = gun->animate(angleOfAttack_deg);
 
-            ma_engine_play_sound(g_audioEngine, "sounds/firing.wav", NULL);
+            ma_engine_play_sound(g_audioEngine, SOUND_FIRING, NULL);
 
         }
 
@@ -504,7 +503,7 @@ class Word {
         }
     }
 
-    string getRandomWord(vector<Bomb> &currentBombs) {
+    string getRandomWord(const list<Bomb> &currentBombs) {
         if (words.empty()) {
             return "";
         }
@@ -539,6 +538,8 @@ class GameOver {
     PixelArtText gameOverTxt = PixelArtText(2);
     PixelArtText scoreTxt = PixelArtText(1);
     PixelArtText highScoreTxt = PixelArtText(0.7);
+    PixelArtText playAgainTxt = PixelArtText(0.7);
+
 
 
     void draw(ma_engine *g_audioEngine) {
@@ -550,7 +551,7 @@ class GameOver {
         // To fade the gameplay (opacity lowered)
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glColor4f(0.0f, 0.0f, 0.0f, 0.30f);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.70f);
         glBegin(GL_QUADS);
             glVertex2f(190, 100);
             glVertex2f(190, -100);
@@ -559,9 +560,9 @@ class GameOver {
         glEnd();
 
         gameOverTxt.setColor(214, 40, 40);
-        gameOverTxt.drawCentered("GAME OVER", 0, 30, 190);
+        gameOverTxt.drawCentered("GAME OVER", 0, 50, 190);
 
-        scoreTxt.drawCentered(to_string(score), 0, 0, 190);
+        scoreTxt.drawCentered(to_string(score), 0, 20, 190);
 
         // Check if new high score made
         HIGH_SCORE = highScore.loadHighScore();
@@ -569,12 +570,14 @@ class GameOver {
         if (score >= HIGH_SCORE) {
             highScore.saveHighScore(score);
 
-            highScoreTxt.setColor(214, 40, 40);
-            highScoreTxt.drawCentered("NEW HI " + to_string(HIGH_SCORE), 0, -15, 190);
+            highScoreTxt.drawCentered("NEW HI " + to_string(HIGH_SCORE), 0, 5, 190);
         }
         else {
-            highScoreTxt.drawCentered("HI " + to_string(HIGH_SCORE), 0, -15, 190);
+            highScoreTxt.drawCentered("HI " + to_string(HIGH_SCORE), 0, 5, 190);
         }
+
+        playAgainTxt.drawCentered("Press ENTER to play again", 0, -20, 190);
+
     }
 };
 
@@ -604,3 +607,4 @@ class HomePage {
     }
 
 };
+

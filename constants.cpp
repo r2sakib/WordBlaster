@@ -10,7 +10,7 @@ const float GUN_X = 9.0f;
 const float GUN_Y = -80.0f;
 
 const float BOMB_RADIUS = 2.0f;
-const float BOMB_SPEED = 0.15;
+const float BOMB_SPEED = 0.5;
 float BOMB_EXPLOSION_MAX_RADIUS = 6.0f;
 const int BOMB_WAVE_TIME_SEC = 10;
 
@@ -23,9 +23,16 @@ const int TOTAL_LIVES = 3;
 int livesLeft = 3;
 int score = 0;
 
-const char* SOUND_BACKGROUND = "sounds/background.wav";
-const char* SOUND_GAME_OVER = "sounds/game_over.wav";
-const char* SOUND_EXPLOSION = "sounds/life_lose.wav";
+enum GameState {
+    START_SCREEN,
+    PLAYING,
+    GAME_OVER
+};
+
+const char* SOUND_BACKGROUND = "res/sounds/background.wav";
+const char* SOUND_FIRING = "res/sounds/firing.wav";
+const char* SOUND_GAME_OVER = "res/sounds/game_over.wav";
+const char* SOUND_LIFE_LOSE = "res/sounds/life_lose.wav";
 
 const vector<string> EMBEDDED_WORDS = 
 {

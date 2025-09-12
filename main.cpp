@@ -2,10 +2,11 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <string>
+#include <list>
 #include <vector>
 #include <random>
 #define MINIAUDIO_IMPLEMENTATION
-#include "miniaudio.h"
+#include "res/miniaudio.h"
 
 #include "game.cpp"
 
@@ -19,6 +20,7 @@ void keyboard(unsigned char key, int x, int y);
 void sendBombs(int);
 void loadLives();
 void cleanup();
+void resetGame();
 
 
 Background background = Background();
@@ -29,7 +31,7 @@ GameOver gameOver = GameOver();
 HomePage homepage = HomePage();
 
 
-vector<Bomb> bombs;
+list<Bomb> bombs;
 vector<Bullet> bullets;
 vector<LifeHeart> lifeHearts;
 
@@ -38,7 +40,8 @@ string currentTypedStr;
 ma_engine g_audioEngine;
 ma_sound g_backgroundSound;
 
-bool gameStarted = false;
+// bool gameStarted = false;
+GameState currentState = START_SCREEN;
 
 
 int main(int argc, char** argv) {
@@ -49,9 +52,10 @@ int main(int argc, char** argv) {
     int screenWidth = glutGet(GLUT_SCREEN_WIDTH);
     int screenHeight = glutGet(GLUT_SCREEN_HEIGHT);
 
-    glutInitWindowSize(screenWidth, screenHeight);
-    glutInitWindowPosition(0, 0); 
+    glutInitWindowSize(screenWidth, screenHeight); 
+    glutInitWindowPosition(0, 0);
     glutCreateWindow("Word Blaster");
+
     glutFullScreen();
 
     glutDisplayFunc(display);
@@ -72,7 +76,7 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    ma_sound_init_from_file(&g_audioEngine, SOUND_BACKGROUND, 0, NULL, NULL, &g_backgroundSound);
+    ma_sound_init_from_file(&g_audioEngine, SOUND_BACKGROUND, MA_SOUND_FLAG_STREAM, NULL, NULL, &g_backgroundSound);
     ma_sound_start(&g_backgroundSound);
     ma_sound_set_looping(&g_backgroundSound, MA_TRUE);
     atexit(cleanup);
@@ -115,18 +119,17 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
-    if (!gameStarted) {
+    if (currentState == START_SCREEN) {
         homepage.draw();
         glutSwapBuffers();
 
         return;
     }
 
-
     background.draw();
     
-    for (int i = 0; i < bombs.size(); i++) {
-        bombs[i].draw();
+    for (auto& bomb : bombs) {
+        bomb.draw();
     }
     
     for (int i = 0; i < bullets.size(); i++) {
@@ -148,7 +151,7 @@ void display() {
     liveScoreTxt.draw(to_string(score), -173, 95);
 
 
-    if (player.dead) {
+    if (currentState == GAME_OVER) {
         ma_sound_stop(&g_backgroundSound);
         gameOver.draw(&g_audioEngine);
     }
@@ -162,7 +165,7 @@ void animate(int)
     glutPostRedisplay();
     glutTimerFunc(1000/60, animate, 0);
 
-    if (!gameStarted) {
+    if (currentState == START_SCREEN) {
         homepage.draw();
         return;
     }
@@ -170,22 +173,25 @@ void animate(int)
 
     if (livesLeft == 0) {
         player.dead = true;
+        currentState = GAME_OVER;
     }
 
     if (livesLeft > 0) {
-        for (int i = 0; i < bombs.size(); i++) {
-            bombs[i].animate(&g_audioEngine);
-            if (bombs[i].isDone()) {
-                bombs.erase(bombs.begin() + i);
-                i--;
+        for (auto it = bombs.begin(); it != bombs.end(); ) {
+            it->animate(&g_audioEngine);
+            if (it->isDone()) {
+                it = bombs.erase(it);
+            } else {
+                ++it;
             }
         }
 
-        for (int i = 0; i < bullets.size(); i++) {
-            bullets[i].animate();
-            if (!bullets[i].active) {
-                bullets.erase(bullets.begin() + i);
-                i--;
+        for (auto it = bullets.begin(); it != bullets.end(); ) {
+            it->animate();
+            if (!it->active) {
+                it = bullets.erase(it);
+            } else {
+                ++it;
             }
         }
     }
@@ -201,13 +207,19 @@ void keyboard(unsigned char key, int x, int y) {
     }
 
     // Start game
-    if (key == 13) {
-        gameStarted = true;
+    if (currentState == START_SCREEN && key == 13) {
+        currentState = PLAYING;
+        return;
+    }
+
+    // restart game
+    if (currentState == GAME_OVER && key == 13) {
+        resetGame();
         return;
     }
 
     // Go to next word when space is pressed
-    if (key == 32) {
+    if (currentState == PLAYING && key == 32) {
         currentTypedStr = "";
         return;
     }
@@ -215,9 +227,8 @@ void keyboard(unsigned char key, int x, int y) {
     currentTypedStr += key;
     for (Bomb &bomb : bombs) {
         if (bomb.text.str == currentTypedStr) {
+            bullets.push_back(Bullet(&bomb, &player, &gun, &g_audioEngine));
             currentTypedStr = "";
-            Bullet newBullet(&bomb, &player, &gun, &g_audioEngine);
-            bullets.push_back(newBullet);
         }
     }
     if (currentTypedStr.length() > 5)
@@ -243,4 +254,20 @@ void reshape(int w, int h) {
 
 void cleanup() {
     ma_engine_uninit(&g_audioEngine);
+}
+
+
+void resetGame() {
+    bombs.clear();
+    bullets.clear();
+    lifeHearts.clear();
+    player.dead = false;
+    currentTypedStr = "";
+    livesLeft = 3;
+    score = 0;
+    
+    sendBombs(0);
+    loadLives();
+    
+    currentState = PLAYING;
 }
