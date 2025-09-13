@@ -12,8 +12,8 @@ const float GUN_Y = -80.0f;
 const float BOMB_RADIUS = 2.0f;
 const float BOMB_SPEED = 0.13;
 float BOMB_EXPLOSION_MAX_RADIUS = 6.0f;
-const int BOMB_WAVE_TIME_SEC = 10;
-int NUM_OF_BOMBS_PER_WAVE = 7;
+const int BOMB_WAVE_TIME_SEC = 12;
+int NUM_OF_BOMBS_PER_WAVE = 5;
 
 const float BULLET_SPEED = 3.0f;
 
