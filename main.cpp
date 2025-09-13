@@ -41,7 +41,7 @@ ma_engine g_audioEngine;
 ma_sound g_backgroundSound;
 
 
-GameState currentState = START_SCREEN;
+GameState currentState = HOME_SCREEN;
 
 
 int main(int argc, char** argv) {
@@ -124,7 +124,7 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
-    if (currentState == START_SCREEN) {
+    if (currentState == HOME_SCREEN) {
         homepage.draw();
         glutSwapBuffers();
 
@@ -171,7 +171,7 @@ void animate(int)
     glutPostRedisplay();
     glutTimerFunc(1000/60, animate, 0);
 
-    if (currentState == START_SCREEN) {
+    if (currentState == HOME_SCREEN) {
         homepage.draw();
         return;
     }
@@ -206,20 +206,37 @@ void animate(int)
 
 
 void keyboard(unsigned char key, int x, int y) {
-    // Exit game
-    if (key == 27){
+    // Exit game only from home screen
+    if (currentState == HOME_SCREEN && key == 27){
+        ma_sound soundTransition;
+        ma_sound_init_from_file(&g_audioEngine, SOUND_TRANSITION, 0, NULL, NULL, &soundTransition);
+        ma_sound_start(&soundTransition);
+        while (ma_sound_is_playing(&soundTransition)) {
+            ma_sleep(1);
+        }
+
         exit(0);
         return;
     }
 
-    // Start game
-    if (currentState == START_SCREEN && key == 13) {
+    // Go to home screen from game and game over screen
+    else if ((currentState == PLAYING || currentState == GAME_OVER) && key == 27) {
+        ma_engine_play_sound(&g_audioEngine, SOUND_TRANSITION, NULL);
+        resetGame();
+        currentState = HOME_SCREEN;
+        return;
+    }
+
+    // Start game (from home screen)
+    else if (currentState == HOME_SCREEN && key == 13) {
+        ma_engine_play_sound(&g_audioEngine, SOUND_TRANSITION, NULL);
         currentState = PLAYING;
         return;
     }
 
     // restart game
-    if (currentState == GAME_OVER && key == 13) {
+    else if (currentState == GAME_OVER && key == 13) {
+        ma_engine_play_sound(&g_audioEngine, SOUND_TRANSITION, NULL);
         resetGame();
         return;
     }

@@ -23,7 +23,7 @@ int livesLeft = TOTAL_LIVES;
 int score = 0;
 
 enum GameState {
-    START_SCREEN,
+    HOME_SCREEN,
     PLAYING,
     GAME_OVER
 };
@@ -35,3 +35,4 @@ const char* SOUND_BACKGROUND = "res/sounds/background.wav";
 const char* SOUND_FIRING = "res/sounds/firing.wav";
 const char* SOUND_GAME_OVER = "res/sounds/game_over.wav";
 const char* SOUND_LIFE_LOSE = "res/sounds/life_lose.wav";
+const char* SOUND_TRANSITION = "res/sounds/transition.wav";
