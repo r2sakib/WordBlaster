@@ -68,7 +68,6 @@ int main(int argc, char** argv) {
     animate(0);
     word.loadWords();
     loadLives();
-    sendBombs(0);
 
     // Audio init
     ma_result result = ma_engine_init(NULL, &g_audioEngine);
@@ -89,14 +88,14 @@ int main(int argc, char** argv) {
 
 
 void sendBombs(int) {
-    if (livesLeft == 0)
+    if (currentState != PLAYING)
         return;
 
     for (int i = 0; i < NUM_OF_BOMBS_PER_WAVE; i++) {
         vector<float> point = getRandomPoint();
         Text newWord(word.getRandomWord(bombs), 0, 0);
         
-        Bomb newBomb(2, newWord, point[0], point[1]);
+        Bomb newBomb(BOMB_RADIUS, newWord, point[0], point[1]);
         bombs.push_back(newBomb);
     }
 
@@ -231,6 +230,7 @@ void keyboard(unsigned char key, int x, int y) {
     else if (currentState == HOME_SCREEN && key == 13) {
         ma_engine_play_sound(&g_audioEngine, SOUND_TRANSITION, NULL);
         currentState = PLAYING;
+        sendBombs(0);
         return;
     }
 
@@ -293,7 +293,7 @@ void resetGame() {
     lifeHearts.clear();
     player.dead = false;
     currentTypedStr = "";
-    livesLeft = 3;
+    livesLeft = TOTAL_LIVES;
     score = 0;
     
     sendBombs(0);

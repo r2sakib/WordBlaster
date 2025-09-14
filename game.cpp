@@ -13,7 +13,7 @@
 
 using namespace std;
 
-#include "helperFunctions.cpp"
+#include "utils.cpp"
 
 
 class Player {
