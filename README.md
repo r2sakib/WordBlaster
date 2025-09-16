@@ -17,7 +17,7 @@ Word Blaster is a fast-paced typing game where your goal is to shoot down fallin
 
 *   **Start Game:** Press `ENTER` on the main menu to begin.
 *   **Shoot Bombs:** Type the word displayed on a bomb. The bullet fires automatically upon completing the word.
-*   **Clear Input:** If you make a mistake, press `SPACE` to clear your current typed word and start over.
+*   **Clear Input:** If you make a mistake, press `BACKSPACE` to clear your current typed word and start over.
 *   **Restart:** After the game is over, press `ENTER` to play again.
 *   **Exit:** Press `ESC` at any time to close the game.
 

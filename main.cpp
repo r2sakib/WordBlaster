@@ -241,8 +241,8 @@ void keyboard(unsigned char key, int x, int y) {
         return;
     }
 
-    // Go to next word when space is pressed
-    if (currentState == PLAYING && key == 32) {
+    // Clear current typing word when backspace is pressed
+    if (currentState == PLAYING && key == 8) {
         currentTypedStr = "";
         return;
     }

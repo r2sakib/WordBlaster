@@ -1,5 +1,6 @@
 .vscode
-app.rc
+app_res.rc
 app_res.o
 *.exe
 *.zip
+release
