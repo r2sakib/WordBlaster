@@ -117,7 +117,7 @@ void drawHeart(float centerX, float centerY, float scale) {
 
     int numSteps = 100;
     for (int i = 0; i <= numSteps; ++i) {
-        float t = (float)i / (float)numSteps * 2.0f * M_PI;
+        float t = (float)i / (float)numSteps * 2.0f * PI;
 
         float x = scale * 16.0f * pow(sin(t), 3);
         float y = scale * (13.0f * cos(t) - 5.0f * cos(2 * t) - 2.0f * cos(3 * t) - cos(4 * t));
